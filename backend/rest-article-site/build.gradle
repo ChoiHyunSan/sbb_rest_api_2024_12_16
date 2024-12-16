@@ -7,6 +7,24 @@ plugins {
 group = 'com.ll'
 version = '0.0.1-SNAPSHOT'
 
+// Querydsl Q클래스 생성 위치
+def querydslDir = "src/main/generated"
+
+// Querydsl Q클래스 생성 설정
+tasks.withType(JavaCompile) {
+    options.getGeneratedSourceOutputDirectory().set(file(querydslDir))
+}
+
+// java source set에 querydsl Q클래스 위치 추가
+sourceSets {
+    main.java.srcDirs += [ querydslDir ]
+}
+
+// gradle clean 시에 생성된 Q클래스 삭제
+clean {
+    delete file(querydslDir)
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
@@ -34,6 +52,12 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Querydsl 의존성
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
+    annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
+    annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
 }
 
 tasks.named('test') {
