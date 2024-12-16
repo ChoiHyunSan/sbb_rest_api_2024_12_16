@@ -1,8 +1,6 @@
 package com.ll.restarticlesite.api.dto.request;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 @Data
 public class QuestionListRequest {

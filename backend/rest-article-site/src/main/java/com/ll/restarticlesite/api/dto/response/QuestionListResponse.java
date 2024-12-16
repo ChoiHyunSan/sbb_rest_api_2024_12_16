@@ -1,13 +1,15 @@
 package com.ll.restarticlesite.api.dto.response;
 
 import com.ll.restarticlesite.domain.question.Question;
+import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
+@Builder
 public class QuestionListResponse {
 
     // 필요한 내용
@@ -20,12 +22,13 @@ public class QuestionListResponse {
     private String author;
 
     public static QuestionListResponse createQuestionListResponse(Question question) {
-        QuestionListResponse response = new QuestionListResponse();
-        response.setId(question.getId());
-        response.setSubject(question.getSubject());
-        response.setContent(question.getContent());
-        response.setUpdateAt(question.getModifiedAt());
-        response.setAuthor(question.getAuthor().getUsername());
-        return response;
+        return QuestionListResponse.builder()
+                .id(question.getId())
+                .subject(question.getSubject())
+                .content(question.getContent())
+                .updateAt(question.getModifiedAt())
+                .views(question.getAnswerList().size())
+                .author(question.getAuthor().getUsername())
+                .build();
     }
 }
