@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class QuestionDetailRequest {
     private int answerPage;
-    private String sort;
+    private String sort = "latest";
 }

@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,7 +41,15 @@ public class AnswerResponse {
                 .sorted(cmp)
                 .toList();
 
+        if (sortedAnswers.isEmpty()) {
+            return new PageImpl<>(Collections.emptyList(), PageRequest.of(page, size), 0);
+        }
+
         int start = page * size;
+        if (start >= sortedAnswers.size()) {
+            return new PageImpl<>(Collections.emptyList(), PageRequest.of(page, size), sortedAnswers.size());
+        }
+
         int end = Math.min(start + size, sortedAnswers.size());
 
         List<AnswerResponse> pageContent = sortedAnswers.subList(start, end)
