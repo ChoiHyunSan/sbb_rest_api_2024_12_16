@@ -139,4 +139,8 @@ public class QuestionService {
         question.getVoter().add(user);
         questionRepository.save(question);
     }
+
+    public Question findById(Long questionId) {
+        return questionRepository.findById(questionId).orElseThrow(() -> new ResourceNotFoundException("Question Not Found"));
+    }
 }

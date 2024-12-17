@@ -44,11 +44,11 @@ public class Answer extends BaseEntity {
 
     protected Answer() {}
 
-    public static Answer createAnswer(Question question, String content, User author) {
+    public static Answer createAnswer(Question question, String content, User user) {
         Answer answer = new Answer();
         answer.question = question;
         answer.content = content;
-        answer.user = author;
+        answer.user = user;
         question.getAnswerList().add(answer);
         return answer;
     }

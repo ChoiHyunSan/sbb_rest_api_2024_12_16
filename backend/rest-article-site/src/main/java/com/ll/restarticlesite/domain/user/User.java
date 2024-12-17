@@ -3,6 +3,8 @@ package com.ll.restarticlesite.domain.user;
 import com.ll.restarticlesite.domain.BaseEntity;
 import com.ll.restarticlesite.security.Role;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
@@ -11,7 +13,9 @@ import java.util.Set;
 
 @Entity
 @Getter
+@Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
+@AllArgsConstructor
 public class User extends BaseEntity {
 
     @Id

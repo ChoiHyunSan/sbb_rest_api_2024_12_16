@@ -62,6 +62,8 @@ public class Question extends BaseEntity {
                 .category(category)
                 .views(0L)
                 .user(user)
+                .answerList(new ArrayList<>())
+                .voter(new HashSet<>())
                 .build();
     }
 
