@@ -1,4 +1,4 @@
-package com.ll.restarticlesite.api.dto.response;
+package com.ll.restarticlesite.api.dto.response.answer;
 
 
 import com.ll.restarticlesite.domain.answer.Answer;

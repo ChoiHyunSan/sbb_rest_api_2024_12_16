@@ -1,11 +1,11 @@
 package com.ll.restarticlesite.api.v1;
 
-import com.ll.restarticlesite.api.dto.request.QuestionCreateRequest;
-import com.ll.restarticlesite.api.dto.request.QuestionDetailRequest;
-import com.ll.restarticlesite.api.dto.request.QuestionListRequest;
-import com.ll.restarticlesite.api.dto.response.QuestionCreateResponse;
-import com.ll.restarticlesite.api.dto.response.QuestionDetailResponse;
-import com.ll.restarticlesite.api.dto.response.QuestionListResponse;
+import com.ll.restarticlesite.api.dto.request.question.QuestionCreateRequest;
+import com.ll.restarticlesite.api.dto.request.question.QuestionDetailRequest;
+import com.ll.restarticlesite.api.dto.request.question.QuestionListRequest;
+import com.ll.restarticlesite.api.dto.response.question.QuestionCreateResponse;
+import com.ll.restarticlesite.api.dto.response.question.QuestionDetailResponse;
+import com.ll.restarticlesite.api.dto.response.question.QuestionListResponse;
 import com.ll.restarticlesite.domain.category.Category;
 import com.ll.restarticlesite.domain.category.CategoryService;
 import com.ll.restarticlesite.domain.question.QuestionService;
@@ -104,6 +104,30 @@ public class QuestionRestController {
                                                  @RequestBody QuestionCreateRequest request) {
         // TODO : 미인증 시, 예외 반환
         questionService.modifyQuestion(id, request.getSubject(), request.getContent(), request.getCategory());
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 권한 인증 필요 + 자신이 작성한 질문에 한해서 가능
+     * @param id 질문 ID
+     * @return 처리 상태코드 반환
+     */
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> deleteQuestion(@PathVariable Long id){
+        // TODO :  Username을 현재 세션의 username으로 검색하게끔 수정
+        questionService.deleteQuestion(/*username*/ "user1", id);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * 권한 인증 필요
+     * @param id 질문 ID
+     * @return 처리 상태코드 반환
+     */
+    @PostMapping("/vote/{id}")
+    public ResponseEntity<Void> voteQuestion(@PathVariable Long id){
+        // TODO :  Username을 현재 세션의 username으로 검색하게끔 수정
+        questionService.voteQuestion(/*username*/ "user1", id);
         return ResponseEntity.ok().build();
     }
 }

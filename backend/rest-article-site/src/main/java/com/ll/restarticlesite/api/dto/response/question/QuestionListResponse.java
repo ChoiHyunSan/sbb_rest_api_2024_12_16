@@ -1,4 +1,4 @@
-package com.ll.restarticlesite.api.dto.response;
+package com.ll.restarticlesite.api.dto.response.question;
 
 import com.ll.restarticlesite.domain.question.Question;
 import lombok.Builder;

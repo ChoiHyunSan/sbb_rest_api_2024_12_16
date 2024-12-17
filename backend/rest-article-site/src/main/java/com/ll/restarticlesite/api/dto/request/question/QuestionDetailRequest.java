@@ -1,4 +1,4 @@
-package com.ll.restarticlesite.api.dto.request;
+package com.ll.restarticlesite.api.dto.request.question;
 
 import lombok.Data;
 

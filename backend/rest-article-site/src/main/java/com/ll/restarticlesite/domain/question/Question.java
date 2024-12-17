@@ -1,5 +1,6 @@
 package com.ll.restarticlesite.domain.question;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ll.restarticlesite.domain.BaseEntity;
 import com.ll.restarticlesite.domain.answer.Answer;
 import com.ll.restarticlesite.domain.user.User;
@@ -42,6 +43,7 @@ public class Question extends BaseEntity {
     @JoinColumn(name = "category_id")
     private Category category;
 
+    @JsonIgnore
     @ManyToMany
     Set<User> voter = new HashSet<User>();
 

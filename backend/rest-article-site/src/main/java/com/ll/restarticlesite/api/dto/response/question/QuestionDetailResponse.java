@@ -1,5 +1,6 @@
-package com.ll.restarticlesite.api.dto.response;
+package com.ll.restarticlesite.api.dto.response.question;
 
+import com.ll.restarticlesite.api.dto.response.answer.AnswerResponse;
 import com.ll.restarticlesite.domain.answer.Answer;
 import com.ll.restarticlesite.domain.question.Question;
 import lombok.Builder;

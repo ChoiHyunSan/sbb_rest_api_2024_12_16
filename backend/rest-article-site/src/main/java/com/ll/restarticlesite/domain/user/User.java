@@ -3,6 +3,7 @@ package com.ll.restarticlesite.domain.user;
 import com.ll.restarticlesite.domain.BaseEntity;
 import com.ll.restarticlesite.security.Role;
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.util.HashSet;
@@ -10,10 +11,13 @@ import java.util.Set;
 
 @Entity
 @Getter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public class User extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
+    @EqualsAndHashCode.Include
     private long id;
 
     @Column(unique = true)

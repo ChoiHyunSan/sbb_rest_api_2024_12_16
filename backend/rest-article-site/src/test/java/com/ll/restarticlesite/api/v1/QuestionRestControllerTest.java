@@ -5,11 +5,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-import com.ll.restarticlesite.api.dto.request.QuestionCreateRequest;
+import com.ll.restarticlesite.api.dto.request.question.QuestionCreateRequest;
 import com.ll.restarticlesite.domain.category.Category;
-import com.ll.restarticlesite.global.exception.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,6 +136,54 @@ class QuestionRestControllerTest {
         mockMvc.perform(put("/api/v1/questions/{id}", questionId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("질문 삭제 - 성공")
+    void deleteQuestion_success() throws Exception {
+        // given
+        Long questionId = 1L; // 존재하는 질문 ID (테스트 데이터 필요)
+
+        // when & then
+        mockMvc.perform(delete("/api/v1/questions/{id}", questionId))
+                .andExpect(status().isNoContent())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("질문 삭제 - 실패 (없는 ID)")
+    void deleteQuestion_notFound() throws Exception {
+        // given
+        Long nonExistentId = 9999L;
+
+        // when & then
+        mockMvc.perform(delete("/api/v1/questions/{id}", nonExistentId))
+                .andExpect(status().isNotFound())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("질문 삭제 - 실패 (권한 없음)")
+    void deleteQuestion_forbidden() throws Exception {
+        // given
+        Long questionId = 16L; // 다른 사용자가 작성한 질문 ID (테스트 데이터 필요)
+
+        // when & then
+        mockMvc.perform(delete("/api/v1/questions/{id}", questionId))
+                .andExpect(status().isForbidden())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("질문 투표 - 성공")
+    void voteQuestion_success() throws Exception {
+        // given
+        Long questionId = 1L; // 존재하는 질문 ID (테스트 데이터 필요)
+
+        // when & then
+        mockMvc.perform(post("/api/v1/questions/vote/{id}", questionId))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
