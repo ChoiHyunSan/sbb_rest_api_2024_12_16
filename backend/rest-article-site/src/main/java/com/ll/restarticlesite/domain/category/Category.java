@@ -1,11 +1,13 @@
 package com.ll.restarticlesite.domain.category;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ll.restarticlesite.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 
 @Entity
 @Getter
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Category extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

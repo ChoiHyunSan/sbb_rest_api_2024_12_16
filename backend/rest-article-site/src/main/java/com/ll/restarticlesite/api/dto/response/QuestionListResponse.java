@@ -3,8 +3,6 @@ package com.ll.restarticlesite.api.dto.response;
 import com.ll.restarticlesite.domain.question.Question;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -28,7 +26,7 @@ public class QuestionListResponse {
                 .content(question.getContent())
                 .updateAt(question.getModifiedAt())
                 .views(question.getAnswerList().size())
-                .author(question.getAuthor().getUsername())
+                .author(question.getUser().getUsername())
                 .build();
     }
 }

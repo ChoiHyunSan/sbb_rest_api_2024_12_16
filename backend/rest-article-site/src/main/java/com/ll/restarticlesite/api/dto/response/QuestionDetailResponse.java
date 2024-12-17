@@ -30,7 +30,7 @@ public class QuestionDetailResponse {
                 .subject(question.getSubject())
                 .content(question.getContent())
                 .createDate(question.getCreatedAt())
-                .author(question.getAuthor().getUsername())
+                .author(question.getUser().getUsername())
                 .modifyDate(question.getModifiedAt())
                 .answerPage(AnswerResponse.answerResponsePagingList(question.getAnswerList(), pageNum, size, cmp))
                 .likes(question.getVoter().size())

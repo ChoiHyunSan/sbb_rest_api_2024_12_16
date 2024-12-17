@@ -1,8 +1,14 @@
 package com.ll.restarticlesite.domain.question;
 
+import com.ll.restarticlesite.api.dto.response.QuestionCreateResponse;
 import com.ll.restarticlesite.api.dto.response.QuestionDetailResponse;
 import com.ll.restarticlesite.api.dto.response.QuestionListResponse;
 import com.ll.restarticlesite.domain.answer.Answer;
+import com.ll.restarticlesite.domain.category.Category;
+import com.ll.restarticlesite.domain.category.CategoryService;
+import com.ll.restarticlesite.domain.user.User;
+import com.ll.restarticlesite.domain.user.UserService;
+import com.ll.restarticlesite.global.exception.ResourceNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -15,6 +21,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import static com.ll.restarticlesite.api.dto.response.QuestionCreateResponse.createQuestionCreateResponse;
 import static com.ll.restarticlesite.api.dto.response.QuestionDetailResponse.createQuestionDetailResponse;
 import static com.ll.restarticlesite.domain.question.QQuestion.question;
 import static java.util.Comparator.comparing;
@@ -27,13 +34,15 @@ public class QuestionService {
 
     private final QuestionRepository questionRepository;
     private final JPAQueryFactory queryFactory;
+    private final UserService userService;
+    private final CategoryService categoryService;
     private static final long PAGE_SIZE = 10;
     private final static int ANSWER_PAGE_SIZE = 5;
 
     @Transactional
     public List<QuestionListResponse> getQuestionList(final int page, final String kw, final String sort) {
         return queryFactory.selectFrom(QQuestion.question)
-                .leftJoin(QQuestion.question.author).fetchJoin()
+                .leftJoin(QQuestion.question.user).fetchJoin()
                 .where(hasKeyword(kw))
                 .orderBy(getOrderSpecifier(sort))
                 .offset(page * PAGE_SIZE)
@@ -53,7 +62,7 @@ public class QuestionService {
         }else{
             builder.or(question.subject.like("%" + kw + "%"))
                     .or(question.content.like("%" + kw + "%"))
-                    .or(question.author.username.like("%" + kw + "%"));
+                    .or(question.user.username.like("%" + kw + "%"));
         }
         return builder;
     }
@@ -65,7 +74,7 @@ public class QuestionService {
             case "views" -> question.views.desc();
             case "likes" -> question.voter.size().desc();
             case "answers" -> question.answerList.size().desc();
-            case "author" -> question.author.username.desc();
+            case "author" -> question.user.username.desc();
             default -> question.createdAt.desc(); // 기본값
         };
     }
@@ -73,7 +82,7 @@ public class QuestionService {
     public Optional<QuestionDetailResponse> getQuestionDetail(final Long id, final int answerPage, final String sort) {
         Optional<Question> questionOpt = questionRepository.findById(id);
         if(questionOpt.isEmpty()){
-
+            throw new ResourceNotFoundException("Question not found");
         }
         return Optional.of(createQuestionDetailResponse(questionOpt.get(),
                 answerPage,
@@ -82,9 +91,36 @@ public class QuestionService {
     }
 
     public static final String SORT_LATEST = "latest";
-    private Comparator<Answer> getComparator(String sort) {
+    private Comparator<Answer> getComparator(final String sort) {
         return SORT_LATEST.equals(sort)
                 ? comparing(Answer::getCreatedAt).reversed()
                 : comparingInt(a -> -a.getVoter().size());
+    }
+
+    public QuestionCreateResponse getCreateResponse(final Long id) {
+        Optional<Question> byId = questionRepository.findById(id);
+        if(byId.isEmpty()){
+            throw new ResourceNotFoundException("Question Resource Not Found");
+        }
+        Question question = byId.get();
+
+        return createQuestionCreateResponse(
+                categoryService.getCategories(),
+                question.getSubject(),
+                question.getContent()
+        );
+    }
+
+    public void createQuestion(final String username, final String subject, final String content, final Category category) {
+        User byUsername = userService.findByUsername(username);
+        log.info(byUsername.getUsername());
+        Question question = Question.createQuestion(byUsername, subject, content, category);
+        questionRepository.save(question);
+    }
+
+    public void modifyQuestion(Long id, String subject, String content, Category category) {
+        Question question = questionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Question Resource Not Found"));
+        question.modify(subject, content, category);
+        questionRepository.save(question);
     }
 }
