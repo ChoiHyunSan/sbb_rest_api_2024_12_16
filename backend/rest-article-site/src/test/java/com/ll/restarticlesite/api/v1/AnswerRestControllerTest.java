@@ -21,14 +21,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -224,6 +223,56 @@ public class AnswerRestControllerTest {
         mockMvc.perform(put("/api/v1/answers/" + invalidAnswerId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("답변 삭제 - 성공")
+    void deleteAnswer() throws Exception {
+        // given
+        Answer answer = answerRepository.findAll().get(1);
+
+        // when & then
+        mockMvc.perform(delete("/api/v1/answers/" + answer.getId()))
+                .andExpect(status().isNoContent());
+
+        assertThat(answerRepository.findById(answer.getId())).isEmpty();
+    }
+
+    @Test
+    @DisplayName("답변 삭제 - 존재하지 않는 답변")
+    void deleteAnswer_withInvalidAnswerId() throws Exception {
+        // given
+        Long invalidAnswerId = 999999L;
+
+        // when & then
+        mockMvc.perform(delete("/api/v1/answers/" + invalidAnswerId))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("답변 투표 - 성공")
+    void voteAnswer() throws Exception {
+        // given
+        Answer answer = answerRepository.findAll().get(0);
+        int initialVoteCount = answer.getVoter().size(); // voteCount 필드가 있다고 가정
+
+        // when & then
+        mockMvc.perform(post("/api/v1/answers/vote/" + answer.getId()))
+                .andExpect(status().isOk());
+
+        Answer votedAnswer = answerRepository.findById(answer.getId()).orElseThrow();
+        assertThat(votedAnswer.getVoter().size()).isEqualTo(initialVoteCount + 1);
+    }
+
+    @Test
+    @DisplayName("답변 투표 - 존재하지 않는 답변")
+    void voteAnswer_withInvalidAnswerId() throws Exception {
+        // given
+        Long invalidAnswerId = 999999L;
+
+        // when & then
+        mockMvc.perform(post("/api/v1/answers/vote/" + invalidAnswerId))
                 .andExpect(status().isNotFound());
     }
 }

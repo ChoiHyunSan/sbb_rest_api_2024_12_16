@@ -40,6 +40,8 @@ public class QuestionService {
     private static final long PAGE_SIZE = 10;
     private final static int ANSWER_PAGE_SIZE = 5;
 
+    private final static String RESOURCE_ERROR_MSG = "Question Resource Not Found";
+
     @Transactional
     public List<QuestionListResponse> getQuestionList(final int page, final String kw, final String sort) {
         return queryFactory.selectFrom(QQuestion.question)
@@ -101,7 +103,7 @@ public class QuestionService {
     public QuestionCreateResponse getCreateResponse(final Long id) {
         Optional<Question> byId = questionRepository.findById(id);
         if(byId.isEmpty()){
-            throw new ResourceNotFoundException("Question Resource Not Found");
+            throw new ResourceNotFoundException(RESOURCE_ERROR_MSG);
         }
         Question question = byId.get();
 
@@ -120,13 +122,13 @@ public class QuestionService {
     }
 
     public void modifyQuestion(Long id, String subject, String content, Category category) {
-        Question question = questionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Question Resource Not Found"));
+        Question question = questionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(RESOURCE_ERROR_MSG));
         question.modify(subject, content, category);
         questionRepository.save(question);
     }
 
     public void deleteQuestion(String username, Long id) {
-        Question question = questionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Question Resource Not Found"));
+        Question question = questionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(RESOURCE_ERROR_MSG));
         if(!question.getUser().getUsername().equals(username)){
             throw new UnauthorizedException("유저와 질문의 작성자가 일치하지 않습니다. 유저 : " + username + ", 질문 : " + question.getUser().getUsername());
         }
@@ -134,13 +136,13 @@ public class QuestionService {
     }
 
     public void voteQuestion(String username, Long id) {
-        Question question = questionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Question Resource Not Found"));
+        Question question = questionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(RESOURCE_ERROR_MSG));
         User user = userService.findByUsername(username);
         question.getVoter().add(user);
         questionRepository.save(question);
     }
 
     public Question findById(Long questionId) {
-        return questionRepository.findById(questionId).orElseThrow(() -> new ResourceNotFoundException("Question Not Found"));
+        return questionRepository.findById(questionId).orElseThrow(() -> new ResourceNotFoundException(RESOURCE_ERROR_MSG));
     }
 }

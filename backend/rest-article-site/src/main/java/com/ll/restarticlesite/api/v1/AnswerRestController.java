@@ -74,4 +74,28 @@ public class AnswerRestController {
         answerService.modifyAnswer(/*username*/"user1", id, request.getContent());
         return ResponseEntity.ok().build();
     }
+
+    /**
+     * 권한 인증 필요 + 자신이 작성한 질문에 한해서 가능
+     * @param id 질문 ID
+     * @return 처리 상태코드 반환
+     */
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> deleteQuestion(@PathVariable Long id){
+        // TODO :  Username을 현재 세션의 username으로 검색하게끔 수정
+        answerService.deleteAnswer(/*username*/ "user1", id);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * 권한 인증 필요
+     * @param id 질문 ID
+     * @return 처리 상태코드 반환
+     */
+    @PostMapping("/vote/{id}")
+    public ResponseEntity<Void> voteQuestion(@PathVariable Long id){
+        // TODO :  Username을 현재 세션의 username으로 검색하게끔 수정
+        answerService.voteAnswer(/*username*/ "user1", id);
+        return ResponseEntity.ok().build();
+    }
 }

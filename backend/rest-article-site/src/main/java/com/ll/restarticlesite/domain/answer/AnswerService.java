@@ -30,6 +30,7 @@ public class AnswerService {
     private final AnswerRepository answerRepository;
     private final static int ANSWER_PAGE_SIZE = 10;
     private final JPAQueryFactory queryFactory;
+    private final static String RESOURCE_ERROR_MSG = "Answer Resource Not Found";
 
     public List<AnswerListResponse> getAnswerResponsePage(final int page) {
         Pageable pageable = PageRequest.of(page, ANSWER_PAGE_SIZE);
@@ -52,7 +53,7 @@ public class AnswerService {
     }
 
     public AnswerCreateResponse getAnswerCreateResponse(String username, Long id) {
-        Answer answer = answerRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Answer Not Found"));
+        Answer answer = answerRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(RESOURCE_ERROR_MSG));
         if(!answer.getUser().getUsername().equals(username)) {
             throw new UnauthorizedException("현재 접속한 유저가 작성한 글이 아닙니다. Username : " + username + " Answer Id : " + id);
         }
@@ -60,11 +61,26 @@ public class AnswerService {
     }
 
     public AnswerDetailResponse modifyAnswer(String username, Long id, String content) {
-        Answer answer = answerRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Answer Not Found"));
+        Answer answer = answerRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(RESOURCE_ERROR_MSG));
         if(!answer.getUser().getUsername().equals(username)) {
             throw new UnauthorizedException("현재 접속한 유저가 작성한 글이 아닙니다. Username : " + username + " Answer Id : " + id);
         }
         answer.modify(content);
         return AnswerDetailResponse.createAnswerResponse(answerRepository.save(answer));
+    }
+
+    public void deleteAnswer(String username, Long id) {
+        Answer answer = answerRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(RESOURCE_ERROR_MSG));
+        if(!answer.getUser().getUsername().equals(username)){
+            throw new UnauthorizedException("유저와 답변의 작성자가 일치하지 않습니다. 유저 : " + username + ", 답변 : " + answer.getUser().getUsername());
+        }
+        answerRepository.delete(answer);
+    }
+
+    public void voteAnswer(String username, Long id) {
+        Answer answer = answerRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(RESOURCE_ERROR_MSG));
+        User user = userService.findByUsername(username);
+        answer.getVoter().add(user);
+        answerRepository.save(answer);
     }
 }
