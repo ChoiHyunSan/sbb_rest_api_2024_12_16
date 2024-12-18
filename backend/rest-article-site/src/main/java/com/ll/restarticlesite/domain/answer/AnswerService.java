@@ -1,21 +1,24 @@
 package com.ll.restarticlesite.domain.answer;
 
 import com.ll.restarticlesite.api.dto.request.answer.AnswerListRequest;
+import com.ll.restarticlesite.api.dto.response.answer.AnswerCreateResponse;
+import com.ll.restarticlesite.api.dto.response.answer.AnswerDetailResponse;
 import com.ll.restarticlesite.api.dto.response.answer.AnswerListResponse;
 import com.ll.restarticlesite.domain.question.Question;
 import com.ll.restarticlesite.domain.question.QuestionService;
 import com.ll.restarticlesite.domain.user.User;
 import com.ll.restarticlesite.domain.user.UserService;
+import com.ll.restarticlesite.global.exception.ResourceNotFoundException;
+import com.ll.restarticlesite.global.exception.UnauthorizedException;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.ll.restarticlesite.api.dto.response.answer.AnswerCreateResponse.createAnswerCreateResponse;
 import static com.ll.restarticlesite.domain.answer.QAnswer.answer;
 
 @Service
@@ -46,5 +49,22 @@ public class AnswerService {
         Question question = questionService.findById(questionId);
         User user = userService.findByUsername(username);
         return answerRepository.save(Answer.createAnswer(question, content, user));
+    }
+
+    public AnswerCreateResponse getAnswerCreateResponse(String username, Long id) {
+        Answer answer = answerRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Answer Not Found"));
+        if(!answer.getUser().getUsername().equals(username)) {
+            throw new UnauthorizedException("현재 접속한 유저가 작성한 글이 아닙니다. Username : " + username + " Answer Id : " + id);
+        }
+        return createAnswerCreateResponse(answer);
+    }
+
+    public AnswerDetailResponse modifyAnswer(String username, Long id, String content) {
+        Answer answer = answerRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Answer Not Found"));
+        if(!answer.getUser().getUsername().equals(username)) {
+            throw new UnauthorizedException("현재 접속한 유저가 작성한 글이 아닙니다. Username : " + username + " Answer Id : " + id);
+        }
+        answer.modify(content);
+        return AnswerDetailResponse.createAnswerResponse(answerRepository.save(answer));
     }
 }

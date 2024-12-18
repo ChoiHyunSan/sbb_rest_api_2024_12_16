@@ -112,11 +112,11 @@ public class QuestionService {
         );
     }
 
-    public void createQuestion(final String username, final String subject, final String content, final Category category) {
+    public Question createQuestion(final String username, final String subject, final String content, final Category category) {
         User byUsername = userService.findByUsername(username);
         log.info(byUsername.getUsername());
         Question question = Question.createQuestion(byUsername, subject, content, category);
-        questionRepository.save(question);
+        return questionRepository.save(question);
     }
 
     public void modifyQuestion(Long id, String subject, String content, Category category) {

@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @Builder
-public class AnswerResponse {
+public class AnswerDetailResponse {
 
     private Long id;
     private String content;
@@ -25,8 +25,8 @@ public class AnswerResponse {
     private String author;
     private Integer likes;
 
-    public static AnswerResponse createAnswerResponse(Answer answer) {
-        return AnswerResponse.builder()
+    public static AnswerDetailResponse createAnswerResponse(Answer answer) {
+        return AnswerDetailResponse.builder()
                 .id(answer.getId())
                 .content(answer.getContent())
                 .createDate(answer.getCreatedAt())
@@ -36,7 +36,7 @@ public class AnswerResponse {
                 .build();
     }
 
-    public static Page<AnswerResponse> answerResponsePagingList(List<Answer> answers, int page, int size, Comparator<Answer> cmp){
+    public static Page<AnswerDetailResponse> answerResponsePagingList(List<Answer> answers, int page, int size, Comparator<Answer> cmp){
         List<Answer> sortedAnswers = answers.stream()
                 .sorted(cmp)
                 .toList();
@@ -52,9 +52,9 @@ public class AnswerResponse {
 
         int end = Math.min(start + size, sortedAnswers.size());
 
-        List<AnswerResponse> pageContent = sortedAnswers.subList(start, end)
+        List<AnswerDetailResponse> pageContent = sortedAnswers.subList(start, end)
                 .stream()
-                .map(AnswerResponse::createAnswerResponse)
+                .map(AnswerDetailResponse::createAnswerResponse)
                 .collect(Collectors.toList());
 
         return new PageImpl<>(pageContent, PageRequest.of(page, size), sortedAnswers.size());

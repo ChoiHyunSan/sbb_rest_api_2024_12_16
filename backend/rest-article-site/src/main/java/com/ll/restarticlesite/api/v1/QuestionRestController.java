@@ -8,14 +8,18 @@ import com.ll.restarticlesite.api.dto.response.question.QuestionDetailResponse;
 import com.ll.restarticlesite.api.dto.response.question.QuestionListResponse;
 import com.ll.restarticlesite.domain.category.Category;
 import com.ll.restarticlesite.domain.category.CategoryService;
+import com.ll.restarticlesite.domain.question.Question;
 import com.ll.restarticlesite.domain.question.QuestionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+
+import static com.ll.restarticlesite.api.dto.response.question.QuestionListResponse.createQuestionListResponse;
 
 @Slf4j
 @RestController
@@ -75,15 +79,16 @@ public class QuestionRestController {
      * @return
      */
     @PostMapping
-    public ResponseEntity<Void> createQuestion(@RequestBody QuestionCreateRequest request){
+    public ResponseEntity<QuestionListResponse> createQuestion(@RequestBody QuestionCreateRequest request){
         // TODO : 미인증 시, 예외 반환 + username 실제 username 으로 넘기기
         log.info("questionCreateRequest : {}", request.toString());
-        questionService.createQuestion(/*username*/ "user1", request.getSubject(), request.getContent(), request.getCategory());
-        return ResponseEntity.ok().build();
+        Question question = questionService.createQuestion(/*username*/ "user1", request.getSubject(), request.getContent(), request.getCategory());
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(createQuestionListResponse(question));
     }
 
     /**
-     * 권한 & 인증 필요
+     * 권한 & 인증 필요 , 작성자 본인여부 확인 필요
      * @param id 질문 ID
      * @return
      */
@@ -94,7 +99,7 @@ public class QuestionRestController {
     }
 
     /**
-     * 권한 & 인증 필요
+     * 권한 & 인증 필요 , 작성자 본인여부 확인 필요
      * @param id
      * @param request
      * @return

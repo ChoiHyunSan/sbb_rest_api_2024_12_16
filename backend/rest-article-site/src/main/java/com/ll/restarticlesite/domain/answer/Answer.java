@@ -56,4 +56,8 @@ public class Answer extends BaseEntity {
     public static void modifyAnswer(Answer answer, String content) {
         answer.content = content;
     }
+
+    public void modify(String content) {
+        this.content = content;
+    }
 }

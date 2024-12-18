@@ -3,6 +3,7 @@ package com.ll.restarticlesite.api.v1;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ll.restarticlesite.api.dto.request.answer.AnswerCreateRequest;
+import com.ll.restarticlesite.api.dto.response.answer.AnswerCreateResponse;
 import com.ll.restarticlesite.api.dto.response.answer.AnswerListResponse;
 import com.ll.restarticlesite.domain.answer.Answer;
 import com.ll.restarticlesite.domain.answer.AnswerRepository;
@@ -20,7 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -163,6 +164,64 @@ public class AnswerRestControllerTest {
 
         // when & then
         mockMvc.perform(post("/api/v1/answers/" + invalidQuestionId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("답변 수정 폼 조회 - 성공")
+    void getModifyForm() throws Exception {
+        // given
+        Answer answer = answerRepository.findAll().get(1); // 테스트 데이터 상 user1이 만든 값이 1번 인덱스에 있어서 우선 하드코딩
+
+        // when & then
+        mockMvc.perform(get("/api/v1/answers/edit/" + answer.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(answer.getId()))
+                .andExpect(jsonPath("$.content").value(answer.getContent()));
+    }
+
+    @Test
+    @DisplayName("답변 수정 폼 조회 - 존재하지 않는 답변")
+    void getModifyForm_withInvalidAnswerId() throws Exception {
+        // given
+        Long invalidAnswerId = 999999L;
+
+        // when & then
+        mockMvc.perform(get("/api/v1/answers/edit/" + invalidAnswerId))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("답변 수정 - 성공")
+    void modifyAnswer() throws Exception {
+        // given
+        Answer answer = answerRepository.findAll().get(1);
+        String updatedContent = "수정된 답변 내용입니다.";
+        AnswerCreateRequest request = new AnswerCreateRequest(updatedContent);
+
+        // when
+        mockMvc.perform(put("/api/v1/answers/" + answer.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+        // then
+        Answer updatedAnswer = answerRepository.findById(answer.getId()).orElseThrow();
+        assertThat(updatedAnswer.getContent()).isEqualTo(updatedContent);
+    }
+
+    @Test
+    @DisplayName("답변 수정 - 존재하지 않는 답변")
+    void modifyAnswer_withInvalidAnswerId() throws Exception {
+        // given
+        Long invalidAnswerId = 999999L;
+        AnswerCreateRequest request = new AnswerCreateRequest("수정된 내용");
+
+        // when & then
+        mockMvc.perform(put("/api/v1/answers/" + invalidAnswerId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound());
