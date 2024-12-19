@@ -13,4 +13,8 @@ public class UserService {
     public User findByUsername(String username) {
         return userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
     }
+
+    public void modifyPassword(String username, String oldPassword, String newPassword, String oldPassword1) {
+
+    }
 }

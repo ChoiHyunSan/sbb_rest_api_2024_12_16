@@ -1,10 +1,7 @@
 package com.ll.restarticlesite.api.v1;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ll.restarticlesite.api.dto.request.answer.AnswerCreateRequest;
-import com.ll.restarticlesite.api.dto.response.answer.AnswerCreateResponse;
-import com.ll.restarticlesite.api.dto.response.answer.AnswerListResponse;
 import com.ll.restarticlesite.domain.answer.Answer;
 import com.ll.restarticlesite.domain.answer.AnswerRepository;
 import com.ll.restarticlesite.domain.question.Question;
@@ -21,9 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
