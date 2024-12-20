@@ -4,27 +4,84 @@ import { api } from '../services/api';
 import { commonStyles } from '../styles/commonStyles';
 import Button from './common/Button';
 import ErrorMessage from './common/ErrorMessage';
+import { useFormError } from '../hooks/useFormError';
 
 const QuestionForm = () => {
-  const navigate = useNavigate();
-  const [categories, setCategories] = useState([]);
-  const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     subject: '',
     content: '',
-    category: ''
+    category: null
   });
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { errors, generalError, handleError, clearErrors } = useFormError();
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoading(true);
+        const response = await api.get('/api/v1/questions/new');
+        setCategories(response.data || []);
+      } catch (error) {
+        handleError(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchCategories();
   }, []);
 
-  const fetchCategories = async () => {
+  const validateForm = () => {
+    const errors = {};
+    
+    // 제목 검증
+    if (!formData.subject?.trim()) {
+      errors.subject = '제목은 필수항목입니다';
+    } else if (formData.subject.trim().length < 3) {
+      errors.subject = '제목은 3자 이상이어야 합니다';
+    }
+
+    // 내용 검증
+    if (!formData.content?.trim()) {
+      errors.content = '내용은 필수항목입니다';
+    } else if (formData.content.trim().length < 10) {
+      errors.content = '내용은 10자 이상이어야 합니다';
+    }
+
+    // 카테고리 검증
+    if (!formData.category) {
+      errors.category = '카테고리는 필수항목입니다';
+    }
+
+    return errors;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    clearErrors();
+
+    // 폼 유효성 검사
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      // useFormError hook의 handleError를 사용하여 에러 표시
+      handleError({ response: { data: { errors: validationErrors } } });
+      return;
+    }
+
     try {
-      const data = await api.get('/api/v1/questions/new');
-      setCategories(data);
-    } catch (err) {
-      setError(err.message);
+      const submitData = {
+        ...formData,
+        category: {
+          id: parseInt(formData.category)
+        }
+      };
+
+      await api.post('/api/v1/questions', submitData);
+      navigate('/list');
+    } catch (error) {
+      handleError(error);
     }
   };
 
@@ -36,66 +93,51 @@ const QuestionForm = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError(null);
-
-    try {
-      const submitData = {
-        ...formData,
-        category: {
-          id: parseInt(formData.category)
-        }
-      };
-
-      await api.post('/api/v1/questions', submitData);
-      navigate('/');
-    } catch (err) {
-      setError(err.message);
-    }
-  };
+  if (loading) return <div>카테고리 로딩중...</div>;
 
   return (
     <div style={commonStyles.container}>
-      <h2>질문 작성하기</h2>
+      <h2>질문 작성</h2>
       <Button onClick={() => navigate('/')}>목록으로</Button>
-      <ErrorMessage message={error} />
+      {generalError && <ErrorMessage message={generalError} />}
 
-      <form onSubmit={handleSubmit} style={commonStyles.form}>
+      <form onSubmit={handleSubmit} style={commonStyles.form} noValidate>
         <div style={commonStyles.formGroup}>
-          <label htmlFor="category">카테고리</label>
+          <label htmlFor="category">카테고리:</label>
           <select
             id="category"
             name="category"
-            value={formData.category}
+            value={formData.category || ''}
             onChange={handleChange}
             style={commonStyles.select}
             required
           >
             <option value="">카테고리 선택</option>
-            {categories.map(category => (
+            {Array.isArray(categories) && categories.map(category => (
               <option key={category.id} value={category.id}>
                 {category.name}
               </option>
             ))}
           </select>
+          {errors.category && <ErrorMessage message={errors.category} />}
         </div>
 
         <div style={commonStyles.formGroup}>
-          <label htmlFor="subject">제목</label>
+          <label htmlFor="subject">제목:</label>
           <input
-            id="subject"
             type="text"
+            id="subject"
             name="subject"
             value={formData.subject}
             onChange={handleChange}
             style={commonStyles.input}
             required
           />
+          {errors.subject && <ErrorMessage message={errors.subject} />}
         </div>
 
         <div style={commonStyles.formGroup}>
-          <label htmlFor="content">내용</label>
+          <label htmlFor="content">내용:</label>
           <textarea
             id="content"
             name="content"
@@ -104,9 +146,10 @@ const QuestionForm = () => {
             style={commonStyles.textarea}
             required
           />
+          {errors.content && <ErrorMessage message={errors.content} />}
         </div>
 
-        <Button type="submit">질문 등록</Button>
+        <Button type="submit">작성하기</Button>
       </form>
     </div>
   );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import { usePagination } from '../hooks/usePagination';
@@ -17,11 +17,7 @@ const QuestionList = () => {
   const { page, nextPage, prevPage, setPage } = usePagination(0);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchQuestions();
-  }, [page, keyword, sort]);
-
-  const fetchQuestions = async () => {
+  const fetchQuestions = useCallback(async () => {
     try {
       setLoading(true);
       const queryParams = new URLSearchParams({
@@ -30,15 +26,19 @@ const QuestionList = () => {
         sort
       });
 
-      const data = await api.get(`/api/v1/questions?${queryParams}`);
-      setQuestions(data);
+      const response = await api.get(`/api/v1/questions?${queryParams}`);
+      setQuestions(response.data);
       setError(null);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, keyword, sort]);
+
+  useEffect(() => {
+    fetchQuestions();
+  }, [fetchQuestions]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -62,6 +62,8 @@ const QuestionList = () => {
   };
 
   if (loading) return <div>로딩중...</div>;
+  if (error) return <div>에러: {error}</div>;
+  if (!questions || questions.length === 0) return <div>질문이 없습니다.</div>;
 
   return (
     <div style={commonStyles.container}>

@@ -18,6 +18,7 @@ const QuestionDetail = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const isFirstRender = useRef(true);
+  const [totalPages, setTotalPages] = useState(0);
 
   const fetchQuestionDetail = useCallback(async () => {
     try {
@@ -26,8 +27,9 @@ const QuestionDetail = () => {
         sort
       });
 
-      const data = await api.get(`/api/v1/questions/${id}?${queryParams}`);
-      setQuestion(data);
+      const response = await api.get(`/api/v1/questions/${id}?${queryParams}`);
+      setQuestion(response.data);
+      setTotalPages(response.data.answerPage.totalPages);
       setError(null);
     } catch (err) {
       setError(err.message);
@@ -92,6 +94,31 @@ const QuestionDetail = () => {
     }
   };
 
+  const handlePrevPage = () => {
+    if (answerPage > 0) {
+      setAnswerPage(prev => prev - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (answerPage < totalPages - 1) {
+      setAnswerPage(prev => prev + 1);
+    }
+  };
+
+  const handleModify = () => {
+    navigate(`/question/modify/${id}`, { 
+      state: { 
+        question: {
+          id,
+          subject: question.subject,
+          content: question.content,
+          category: question.category
+        } 
+      }
+    });
+  };
+
   if (loading) return <div>로딩중...</div>;
   if (error) return <ErrorMessage message={error} />;
   if (!question) return <div>질문을 찾을 수 없습니다.</div>;
@@ -118,15 +145,10 @@ const QuestionDetail = () => {
           <Button onClick={handleVote}>추천</Button>
           {user?.username === question.author && (
             <>
-              <Button 
-                onClick={handleDelete} 
-                variant="secondary"
-              >
+              <Button onClick={handleDelete} variant="secondary">
                 삭제
               </Button>
-              <Button 
-                onClick={() => navigate('/question/modify', { state: { question } })}
-              >
+              <Button onClick={handleModify}>
                 수정
               </Button>
             </>
@@ -174,8 +196,14 @@ const QuestionDetail = () => {
                     삭제
                   </Button>
                   <Button
-                    onClick={() => navigate('/answer/modify', {
-                      state: { answer, questionId: id }
+                    onClick={() => navigate(`/answer/modify/${answer.id}`, {
+                      state: { 
+                        answer: {
+                          id: answer.id,
+                          content: answer.content
+                        },
+                        questionId: id 
+                      }
                     })}
                   >
                     수정
@@ -188,15 +216,17 @@ const QuestionDetail = () => {
 
         <div style={commonStyles.pagination}>
           <Button
-            onClick={() => setAnswerPage(Math.max(0, answerPage - 1))}
+            onClick={handlePrevPage}
             disabled={answerPage === 0}
           >
             이전
           </Button>
-          <span>페이지 {answerPage + 1}</span>
+          <span>
+            페이지 {answerPage + 1} / {totalPages}
+          </span>
           <Button
-            onClick={() => setAnswerPage(answerPage + 1)}
-            disabled={!question.answerPage.hasNext}
+            onClick={handleNextPage}
+            disabled={answerPage >= totalPages - 1}
           >
             다음
           </Button>

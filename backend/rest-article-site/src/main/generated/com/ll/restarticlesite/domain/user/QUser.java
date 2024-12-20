@@ -34,6 +34,12 @@ public class QUser extends EntityPathBase<User> {
 
     public final StringPath password = createString("password");
 
+    public final StringPath picture = createString("picture");
+
+    public final StringPath provider = createString("provider");
+
+    public final StringPath providerId = createString("providerId");
+
     public final SetPath<com.ll.restarticlesite.security.Role, EnumPath<com.ll.restarticlesite.security.Role>> roles = this.<com.ll.restarticlesite.security.Role, EnumPath<com.ll.restarticlesite.security.Role>>createSet("roles", com.ll.restarticlesite.security.Role.class, EnumPath.class, PathInits.DIRECT2);
 
     public final StringPath username = createString("username");

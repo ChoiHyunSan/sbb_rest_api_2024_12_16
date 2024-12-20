@@ -7,11 +7,14 @@ import com.ll.restarticlesite.api.dto.response.answer.AnswerListResponse;
 import com.ll.restarticlesite.api.dto.response.answer.AnswerDetailResponse;
 import com.ll.restarticlesite.domain.answer.Answer;
 import com.ll.restarticlesite.domain.answer.AnswerService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
+import java.security.Principal;
 import java.util.List;
 
 import static com.ll.restarticlesite.api.dto.response.answer.AnswerDetailResponse.createAnswerResponse;
@@ -40,12 +43,12 @@ public class AnswerRestController {
      * @param request page
      * @return 생성한 Answer 정보 및 상태 코드 전달
      */
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/{id}")
     public ResponseEntity<AnswerDetailResponse> addAnswer(@PathVariable Long id,
-                                                          @RequestBody AnswerCreateRequest request){
-        // TODO : 미인증 시, 예외 반환
-        // TODO : user1을 현재 세션의 username 으로 검색하게끔 수정
-        Answer answer = answerService.createAnswer(/*username*/ "user1", id, request.getContent());
+                                                          @Valid @RequestBody AnswerCreateRequest request,
+                                                          Principal principal){
+        Answer answer = answerService.createAnswer(principal.getName(), id, request.getContent());
         createAnswerResponse(answer);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -57,10 +60,11 @@ public class AnswerRestController {
      * @param id 답변 ID
      * @return 기존 답변 값 및 상태 코드 전달
      */
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/edit/{id}")
-    public ResponseEntity<AnswerCreateResponse> modifyAnswer(@PathVariable Long id){
-        // TODO : 질문 작성자가 본인인지 확인하는 절차 필요
-        return ResponseEntity.ok().body(answerService.getAnswerCreateResponse(/*username*/"user1", id));
+    public ResponseEntity<AnswerCreateResponse> modifyAnswer(@PathVariable Long id,
+                                                             Principal principal){
+        return ResponseEntity.ok().body(answerService.getAnswerCreateResponse(principal.getName(), id));
     }
 
     /**
@@ -68,10 +72,12 @@ public class AnswerRestController {
      * @param id 답변 ID
      * @return 상태 코드 전달 (페이징을 다시 해야하므로, 다시 Detail 을 조사하는 편이 나은 것으로 판단.)
      */
+    @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}")
     public ResponseEntity<Void> modifyAnswer(@PathVariable Long id,
-                                             @RequestBody AnswerCreateRequest request){
-        answerService.modifyAnswer(/*username*/"user1", id, request.getContent());
+                                             @Valid @RequestBody AnswerCreateRequest request,
+                                             Principal principal){
+        answerService.modifyAnswer(principal.getName(), id, request.getContent());
         return ResponseEntity.ok().build();
     }
 
@@ -80,10 +86,11 @@ public class AnswerRestController {
      * @param id 질문 ID
      * @return 처리 상태코드 반환
      */
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteAnswer(@PathVariable Long id){
-        // TODO :  Username을 현재 세션의 username으로 검색하게끔 수정
-        answerService.deleteAnswer(/*username*/ "user1", id);
+    public ResponseEntity<Void> deleteAnswer(@PathVariable Long id,
+                                             Principal principal){
+        answerService.deleteAnswer(principal.getName(), id);
         return ResponseEntity.noContent().build();
     }
 
@@ -92,10 +99,11 @@ public class AnswerRestController {
      * @param id 답변 ID
      * @return 처리 상태코드 반환
      */
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/vote/{id}")
-    public ResponseEntity<Void> voteAnswer(@PathVariable Long id){
-        // TODO :  Username을 현재 세션의 username으로 검색하게끔 수정
-        answerService.voteAnswer(/*username*/ "user1", id);
+    public ResponseEntity<Void> voteAnswer(@PathVariable Long id,
+                                           Principal principal){
+        answerService.voteAnswer(principal.getName(), id);
         return ResponseEntity.ok().build();
     }
 }

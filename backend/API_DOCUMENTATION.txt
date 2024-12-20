@@ -1,0 +1,102 @@
+REST Article Site API Documentation
+==================================
+
+[개요]
+기본 URL: /api/v1
+모든 요청/응답: JSON 형식
+인증 필요 시: Authorization 헤더 필요
+
+[인증 API]
+1. 인증 상태 확인
+   URL: GET /api/v1/user/status
+   응답: 
+   - 200 (인증됨)
+   - 401 (미인증)
+
+[질문 API]
+1. 질문 목록 조회
+   URL: GET /api/v1/questions
+   매개변수:
+   - page: 페이지 번호 (기본값: 0)
+   - kw: 검색 키워드 (기본값: "")
+   - sort: 정렬 기준 (기본값: "createdAt")
+
+2. 질문 상세 조회
+   URL: GET /api/v1/questions/{id}
+   매개변수:
+   - answerPage: 답변 페이지 번호
+   - sort: 답변 정렬 기준 (기본값: "latest")
+
+3. 질문 작성
+   URL: POST /api/v1/questions
+   인증: 필요
+   요청 본문:
+   {
+     "subject": "제목",
+     "content": "내용",
+     "category": {"id": 1, "name": "카테고리명"}
+   }
+
+4. 질문 투표
+   URL: POST /api/v1/questions/vote/{id}
+   인증: 필요
+
+5. 조회수 증가
+   URL: POST /api/v1/questions/{id}/views
+
+[답변 API]
+1. 답변 목록 조회
+   URL: GET /api/v1/answers
+   매개변수:
+   - page: 페이지 번호
+
+2. 답변 작성
+   URL: POST /api/v1/answers/{questionId}
+   인증: 필요
+   요청 본문:
+   {
+     "content": "답변 내용"
+   }
+
+3. 답변 투표
+   URL: POST /api/v1/answers/vote/{id}
+   인증: 필요
+
+[카테고리 API]
+1. 카테고리 생성
+   URL: POST /api/v1/categories
+   인증: 필요 (관리자 권한)
+   요청 본문:
+   {
+     "name": "카테고리명"
+   }
+
+[사용자 API]
+1. 회원가입
+   URL: POST /api/v1/user
+   요청 본문:
+   {
+     "username": "사용자명",
+     "password1": "비밀번호",
+     "password2": "비밀번호 확인",
+     "email": "이메일"
+   }
+
+2. 비밀번호 변경
+   URL: PUT /api/v1/user
+   인증: 필요
+   요청 본문:
+   {
+     "oldPassword": "기존 비밀번호",
+     "newPassword": "새 비밀번호",
+     "checkPassword": "새 비밀번호 확인"
+   }
+
+[공통 응답 코드]
+200: 성공
+201: 생성 성공
+400: 잘못된 요청
+401: 인증 필요
+403: 권한 없음
+404: 리소스 없음
+500: 서버 오류 

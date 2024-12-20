@@ -10,11 +10,13 @@ import com.ll.restarticlesite.domain.category.Category;
 import com.ll.restarticlesite.domain.category.CategoryService;
 import com.ll.restarticlesite.domain.question.Question;
 import com.ll.restarticlesite.domain.question.QuestionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.security.Principal;
 import java.util.List;
@@ -68,6 +70,7 @@ public class QuestionRestController {
      * 권한 & 인증 필요
      * @return 선택용 카테고리 리스트 반환
      */
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/new")
     public ResponseEntity<List<Category>> createQuestion(Principal principal){
         if (principal == null) {
@@ -82,11 +85,12 @@ public class QuestionRestController {
      * 권한 & 인증 필요
      * @return
      */
+    @PreAuthorize("isAuthenticated()")
     @PostMapping
-    public ResponseEntity<QuestionListResponse> createQuestion(@RequestBody QuestionCreateRequest request){
-        // TODO : 미인증 시, 예외 반환 + username 실제 username 으로 넘기기
+    public ResponseEntity<QuestionListResponse> createQuestion(@Valid @RequestBody QuestionCreateRequest request,
+                                                               Principal principal){
         log.info("questionCreateRequest : {}", request.toString());
-        Question question = questionService.createQuestion(/*username*/ "user1", request.getSubject(), request.getContent(), request.getCategory());
+        Question question = questionService.createQuestion(principal.getName(), request.getSubject(), request.getContent(), request.getCategory());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(createQuestionListResponse(question));
     }
@@ -96,9 +100,9 @@ public class QuestionRestController {
      * @param id 질문 ID
      * @return
      */
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}/edit")
     public ResponseEntity<QuestionCreateResponse> modifyQuestion(@PathVariable Long id){
-        // TODO : 미인증 시, 예외 반환
         return ResponseEntity.ok(questionService.getCreateResponse(id));
     }
 
@@ -108,10 +112,9 @@ public class QuestionRestController {
      * @param request
      * @return
      */
+    @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}")
-    public ResponseEntity<Void> modifyQuestion(@PathVariable Long id,
-                                                 @RequestBody QuestionCreateRequest request) {
-        // TODO : 미인증 시, 예외 반환
+    public ResponseEntity<Void> modifyQuestion(@PathVariable Long id, @Valid @RequestBody QuestionCreateRequest request) {
         questionService.modifyQuestion(id, request.getSubject(), request.getContent(), request.getCategory());
         return ResponseEntity.ok().build();
     }
@@ -121,10 +124,11 @@ public class QuestionRestController {
      * @param id 질문 ID
      * @return 처리 상태코드 반환
      */
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteQuestion(@PathVariable Long id){
-        // TODO :  Username을 현재 세션의 username으로 검색하게끔 수정
-        questionService.deleteQuestion(/*username*/ "user1", id);
+    public ResponseEntity<Void> deleteQuestion(@PathVariable Long id,
+                                               Principal principal){
+        questionService.deleteQuestion(principal.getName(), id);
         return ResponseEntity.noContent().build();
     }
 
@@ -133,10 +137,11 @@ public class QuestionRestController {
      * @param id 질문 ID
      * @return 처리 상태코드 반환
      */
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/vote/{id}")
-    public ResponseEntity<Void> voteQuestion(@PathVariable Long id){
-        // TODO :  Username을 현재 세션의 username으로 검색하게끔 수정
-        questionService.voteQuestion(/*username*/ "user1", id);
+    public ResponseEntity<Void> voteQuestion(@PathVariable Long id,
+                                             Principal principal){
+        questionService.voteQuestion(principal.getName(), id);
         return ResponseEntity.ok().build();
     }
 
