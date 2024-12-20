@@ -3,10 +3,7 @@ package com.ll.restarticlesite.domain.user;
 import com.ll.restarticlesite.domain.BaseEntity;
 import com.ll.restarticlesite.security.Role;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -16,6 +13,7 @@ import java.util.Set;
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @AllArgsConstructor
+@ToString
 public class User extends BaseEntity {
 
     @Id
@@ -35,11 +33,11 @@ public class User extends BaseEntity {
 
     protected User() {}
 
-    public static User createAuthor(String username, String email, String password) {
-        User author = new User();
-        author.username = username;
-        author.email = email;
-        author.password = password;
-        return author;
+    public static User createUser(String username, String email, String password) {
+        User user = new User();
+        user.username = username;
+        user.email = email;
+        user.password = password;
+        return user;
     }
 }

@@ -87,7 +87,10 @@ public class QuestionService {
         if(questionOpt.isEmpty()){
             throw new ResourceNotFoundException("Question not found");
         }
-        return Optional.of(createQuestionDetailResponse(questionOpt.get(),
+        Question question = questionOpt.get();
+        question.addViews();
+        questionRepository.save(question);
+        return Optional.of(createQuestionDetailResponse(question,
                 answerPage,
                 ANSWER_PAGE_SIZE,
                 getComparator(sort)));
@@ -108,7 +111,7 @@ public class QuestionService {
         Question question = byId.get();
 
         return createQuestionCreateResponse(
-                categoryService.getCategories(),
+                question.getCategory(),
                 question.getSubject(),
                 question.getContent()
         );

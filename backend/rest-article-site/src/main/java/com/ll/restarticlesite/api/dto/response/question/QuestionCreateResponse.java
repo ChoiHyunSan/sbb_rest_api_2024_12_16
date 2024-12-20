@@ -9,13 +9,13 @@ import java.util.List;
 public class QuestionCreateResponse {
     private String subject;
     private String content;
-    private List<Category> categories;
+    private Category category;
 
-    public static QuestionCreateResponse createQuestionCreateResponse(List<Category> categories, String subject, String content) {
+    public static QuestionCreateResponse createQuestionCreateResponse(Category category, String subject, String content) {
         QuestionCreateResponse response = new QuestionCreateResponse();
         response.subject = subject;
         response.content = content;
-        response.categories = categories;
+        response.category = category;
         return response;
     }
 }

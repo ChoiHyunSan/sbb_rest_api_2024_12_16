@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -68,8 +69,11 @@ public class QuestionRestController {
      * @return 선택용 카테고리 리스트 반환
      */
     @GetMapping("/new")
-    public ResponseEntity<List<Category>> createQuestion(){
-        // TODO : 미인증 시, 예외 반환
+    public ResponseEntity<List<Category>> createQuestion(Principal principal){
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         return Optional.of(categoryService.getCategories())
                 .map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }

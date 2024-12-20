@@ -4,16 +4,22 @@ import com.ll.restarticlesite.api.dto.request.user.UserCreateRequest;
 import com.ll.restarticlesite.api.dto.request.user.UserPasswordUpdateRequest;
 import com.ll.restarticlesite.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
+@Slf4j
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/users")
-public class UserController {
+@RequestMapping("/api/v1/user")
+public class UserRestController {
 
     private final UserService userService;
+
 
     /**
      * 권한 & 인증 필요
@@ -47,11 +53,16 @@ public class UserController {
      */
     @PostMapping
     public ResponseEntity<Void> createUser(@RequestBody UserCreateRequest request){
-        // TODO : 회원가입 처리
+        log.info(request.toString());
+        userService.createUser(request.getUsername(), request.getEmail(), request.getPassword1(), request.getPassword2());
         return ResponseEntity.ok().build();
     }
 
-    // 로그인은 스프링 시큐리티로 대체
-    // 비밀번호 찾기 (비밀번호 폼 이동 요청, 비밀번호 변경 요청)
-    // 추후에 만들기
+    @GetMapping("/status")
+    public ResponseEntity<Void> checkAuthStatus(Principal principal) {
+        if (principal != null) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
 }
