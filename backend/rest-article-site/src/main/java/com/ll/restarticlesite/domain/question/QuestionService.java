@@ -148,4 +148,11 @@ public class QuestionService {
     public Question findById(Long questionId) {
         return questionRepository.findById(questionId).orElseThrow(() -> new ResourceNotFoundException(RESOURCE_ERROR_MSG));
     }
+
+    @Transactional
+    public void addViews(Long id) {
+        Question question = questionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(RESOURCE_ERROR_MSG));
+        question.addViews();
+        questionRepository.save(question);
+    }
 }

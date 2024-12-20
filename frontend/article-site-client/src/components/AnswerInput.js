@@ -1,84 +1,58 @@
-import React, { useState,  } from 'react';
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+import { api } from '../services/api';
+import { commonStyles } from '../styles/commonStyles';
+import Button from './common/Button';
+import ErrorMessage from './common/ErrorMessage';
+import { useAuth } from '../contexts/AuthContext';
 
-const AnswerInput = ({id, onAnswerSubmit}) => {
+const AnswerInput = ({ id, onAnswerSubmit }) => {
+  const [content, setContent] = useState('');
+  const [error, setError] = useState(null);
+  const { user } = useAuth();
 
-    const [content , setContent] = useState('');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
 
-    const fetchAnswerForm = async (e) => {
-        e.preventDefault();
-
-        try{
-            const formData = new URLSearchParams();
-            formData.append('content', content);
-
-            const response = await  fetch('http://localhost:8080/api/v1/answers/' + id, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json', // JSON 형식으로 변경
-                },
-                body: JSON.stringify({ content: content }), // 데이터를 JSON 형식으로 변환
-                credentials: 'include',
-            });
-
-            if(response.ok){
-                setContent(''); // 폼 초기화
-                onAnswerSubmit();
-            }else{
-                alert('답변 작성에 실패했습니다.');
-            }
-
-        }catch (err){
-            console.log(err);
-            alert('서버 연결 실패');
-        }
+    if (!user) {
+      setError('답변을 작성하려면 로그인이 필요합니다.');
+      return;
     }
 
-    return (
-        <>
-            <div style={containerStyle}>
-                <h3>답변 작성</h3>
-                <form onSubmit={fetchAnswerForm}>
-                <textarea
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    placeholder="답변을 입력해주세요"
-                    style={textareaStyle}
-                    required
-                />
-                    <button type="submit" style={buttonStyle}>
-                        답변 등록
-                    </button>
-                </form>
-            </div>
-        </>
-    )
-}
+    try {
+      await api.post(`/api/v1/answers/${id}`, { content });
+      setContent('');
+      onAnswerSubmit();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
-const containerStyle = {
-    margin: '20px 0',
-    padding: '20px',
-    borderRadius: '8px',
-    backgroundColor: '#f8f9fa'
+  return (
+    <div style={commonStyles.container}>
+      <h3>답변 작성</h3>
+      <ErrorMessage message={error} />
+      
+      <form onSubmit={handleSubmit}>
+        <textarea
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          placeholder="답변을 입력해주세요"
+          style={commonStyles.textarea}
+          required
+        />
+        <Button type="submit">
+          답변 등록
+        </Button>
+      </form>
+    </div>
+  );
 };
 
-const textareaStyle = {
-    width: '100%',
-    minHeight: '150px',
-    padding: '12px',
-    marginBottom: '10px',
-    border: '1px solid #ddd',
-    borderRadius: '4px',
-    resize: 'vertical'
-};
-
-const buttonStyle = {
-    padding: '8px 16px',
-    backgroundColor: '#4CAF50',
-    color: 'white',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    float: 'right'
+AnswerInput.propTypes = {
+  id: PropTypes.string.isRequired,
+  onAnswerSubmit: PropTypes.func.isRequired
 };
 
 export default AnswerInput;

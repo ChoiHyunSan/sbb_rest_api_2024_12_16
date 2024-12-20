@@ -139,4 +139,10 @@ public class QuestionRestController {
         questionService.voteQuestion(/*username*/ "user1", id);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/{id}/views")
+    public ResponseEntity<Void> viewQuestion(@PathVariable Long id){
+        questionService.addViews(id);
+        return ResponseEntity.ok().build();
+    }
 }

@@ -1,186 +1,115 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { api } from '../services/api';
+import { commonStyles } from '../styles/commonStyles';
+import Button from './common/Button';
+import ErrorMessage from './common/ErrorMessage';
 
 const QuestionForm = () => {
-    const navigate = useNavigate();
-    const [categories, setCategories] = useState([]);
+  const navigate = useNavigate();
+  const [categories, setCategories] = useState([]);
+  const [error, setError] = useState(null);
+  const [formData, setFormData] = useState({
+    subject: '',
+    content: '',
+    category: ''
+  });
 
-    const [formData, setFormData] = useState({
-        subject: '',
-        content: '',
-        category: ''  // 선택된 카테고리 id 저장
-    });
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
+  const fetchCategories = async () => {
+    try {
+      const data = await api.get('/api/v1/questions/new');
+      setCategories(data);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
-        const submitData = {
-            ...formData,
-            category: {
-                id: formData.category  // 카테고리 ID를 객체 형태로 감싸기
-            }
-        };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
 
-        try {
-            const response = await fetch('http://localhost:8080/api/v1/questions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-                body: JSON.stringify(submitData)
-            });
-
-            if (response.ok) {
-                navigate('/');  // 작성 완료 후 홈으로 이동
-            } else {
-                alert('질문 등록에 실패했습니다.');
-            }
-        } catch (error) {
-            console.error('질문 등록 실패:', error);
-            alert('서버 연결에 실패했습니다.');
+    try {
+      const submitData = {
+        ...formData,
+        category: {
+          id: parseInt(formData.category)
         }
-    };
+      };
 
-    const alertShown = useRef(false);
-    useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const response = await fetch('http://localhost:8080/api/v1/questions/new', {
-                    credentials: 'include'
-                });
+      await api.post('/api/v1/questions', submitData);
+      navigate('/');
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
-                if (response.status === 401 && !alertShown.current) {  // 인증 실패
-                    alertShown.current = true;
-                    alert("로그인을 먼저 해주세요");
-                    navigate('/');
-                    return;
-                }
+  return (
+    <div style={commonStyles.container}>
+      <h2>질문 작성하기</h2>
+      <Button onClick={() => navigate('/')}>목록으로</Button>
+      <ErrorMessage message={error} />
 
-                if (!response.ok) {
-                    throw new Error('카테고리를 불러오는데 실패했습니다.');
-                }
-
-                const data = await response.json();
-                setCategories(data);
-            } catch (error) {
-                console.error('카테고리 로딩 실패:', error);
-            }
-        };
-
-        fetchCategories();
-    }, [navigate]);
-
-    return (
-        <div style={containerStyle}>
-            <button onClick={() => {
-                navigate('/')
-            }}> 목록으로
-            </button>
-            <h2>질문 작성하기</h2>
-            <form onSubmit={handleSubmit} style={formStyle}>
-                <div style={formGroupStyle}>
-                    <label htmlFor="category">카테고리</label>
-                    <select
-                        id="category"
-                        name="category"
-                        value={formData.category}
-                        onChange={handleChange}
-                        style={inputStyle}
-                        required
-                    >
-                        <option value="">카테고리 선택</option>
-                        {Array.isArray(categories) && categories.map(category => (  // 배열 체크 추가
-                            <option key={category.id} value={category.id}>
-                                {category.name}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
-                <div style={formGroupStyle}>
-                    <label htmlFor="subject">제목</label>
-                    <input
-                        id="subject"
-                        type="text"
-                        name="subject"
-                        value={formData.subject}
-                        onChange={handleChange}
-                        style={inputStyle}
-                        required
-                    />
-                </div>
-
-                <div style={formGroupStyle}>
-                    <label htmlFor="content">내용</label>
-                    <textarea
-                        id="content"
-                        name="content"
-                        value={formData.content}
-                        onChange={handleChange}
-                        style={textareaStyle}
-                        required
-                    />
-                </div>
-
-                <button type="submit" style={buttonStyle}>
-                    질문 등록
-                </button>
-            </form>
+      <form onSubmit={handleSubmit} style={commonStyles.form}>
+        <div style={commonStyles.formGroup}>
+          <label htmlFor="category">카테고리</label>
+          <select
+            id="category"
+            name="category"
+            value={formData.category}
+            onChange={handleChange}
+            style={commonStyles.select}
+            required
+          >
+            <option value="">카테고리 선택</option>
+            {categories.map(category => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
         </div>
-    );
-};
 
-const containerStyle = {
-    maxWidth: '800px',
-    margin: '0 auto',
-    padding: '20px'
-};
+        <div style={commonStyles.formGroup}>
+          <label htmlFor="subject">제목</label>
+          <input
+            id="subject"
+            type="text"
+            name="subject"
+            value={formData.subject}
+            onChange={handleChange}
+            style={commonStyles.input}
+            required
+          />
+        </div>
 
-const formStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px'
-};
+        <div style={commonStyles.formGroup}>
+          <label htmlFor="content">내용</label>
+          <textarea
+            id="content"
+            name="content"
+            value={formData.content}
+            onChange={handleChange}
+            style={commonStyles.textarea}
+            required
+          />
+        </div>
 
-const formGroupStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px'
-};
-
-const inputStyle = {
-    padding: '8px',
-    fontSize: '16px',
-    border: '1px solid #ddd',
-    borderRadius: '4px'
-};
-
-const textareaStyle = {
-    padding: '8px',
-    fontSize: '16px',
-    border: '1px solid #ddd',
-    borderRadius: '4px',
-    minHeight: '200px',
-    resize: 'vertical'
-};
-
-const buttonStyle = {
-    padding: '10px 20px',
-    fontSize: '16px',
-    backgroundColor: '#4CAF50',
-    color: 'white',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer'
+        <Button type="submit">질문 등록</Button>
+      </form>
+    </div>
+  );
 };
 
 export default QuestionForm;

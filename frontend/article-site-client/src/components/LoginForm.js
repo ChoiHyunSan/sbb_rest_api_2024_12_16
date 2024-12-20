@@ -1,68 +1,77 @@
 // components/LoginForm.js
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { commonStyles } from '../styles/commonStyles';
+import Button from './common/Button';
+import ErrorMessage from './common/ErrorMessage';
 
 const LoginForm = () => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    username: '',
+    password: ''
+  });
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
-        try {
-            const formData = new URLSearchParams();
-            formData.append('username', username);
-            formData.append('password', password);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
 
-            const response = await fetch('http://localhost:8080/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: formData,
-                credentials: 'include',
-            });
+    try {
+      await login(formData.username, formData.password);
+      navigate('/');
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
-            if (response.ok) {
-                navigate('/');
-            } else {
-                alert('로그인 실패');
-            }
-        } catch (err) {
-            console.log(err);
-            alert('서버 연결 실패');
-        }
-    };
+  return (
+    <div style={commonStyles.container}>
+      <h2>로그인</h2>
+      <Button onClick={() => navigate('/')}>목록으로</Button>
+      <ErrorMessage message={error} />
 
-    return (
-        <div>
-            <h2>로그인</h2>
-            <button onClick={() => {
-                navigate('/')
-            }}> 목록으로
-            </button>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>아이디:</label>
-                    <input
-                        type="text"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                    />
-                </div>
-                <div>
-                    <label>비밀번호:</label>
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                </div>
-                <button type="submit">로그인</button>
-            </form>
+      <form onSubmit={handleSubmit} style={commonStyles.form}>
+        <div style={commonStyles.formGroup}>
+          <label htmlFor="username">아이디:</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            value={formData.username}
+            onChange={handleChange}
+            style={commonStyles.input}
+            required
+          />
         </div>
-    );
+
+        <div style={commonStyles.formGroup}>
+          <label htmlFor="password">비밀번호:</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            style={commonStyles.input}
+            required
+          />
+        </div>
+
+        <Button type="submit">로그인</Button>
+      </form>
+    </div>
+  );
 };
 
 export default LoginForm;

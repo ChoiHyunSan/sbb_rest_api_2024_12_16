@@ -1,61 +1,41 @@
 // components/MainLayout.js
-import { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import QuestionList from "./QuestionList";
-
+import QuestionList from './QuestionList';
+import { useAuth } from '../contexts/AuthContext';
+import Button from './common/Button';
+import { commonStyles } from '../styles/commonStyles';
 
 const MainLayout = () => {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        // 로그인 상태 확인
-        fetch('http://localhost:8080/api/v1/user/status', {
-            credentials: 'include',
-        })
-            .then(response => {
-                setIsAuthenticated(response.ok);
-            })
-            .catch(() => {
-                setIsAuthenticated(false);
-            });
-    }, []);
+  const handleLogout = async () => {
+    await logout();
+  };
 
-    const handleLogin = () => {
-        navigate('/login');
-    };
-
-    const handleLogout = async () => {
-        try {
-            await fetch('http://localhost:8080/logout', {
-                method: 'POST',
-                credentials: 'include',
-            });
-            setIsAuthenticated(false);
-        } catch (error) {
-            console.error('Logout failed:', error);
-        }
-    };
-
-    function handleSignup() {
-        navigate('/signup');
-    }
-
-    return (
-        <div>
-            <nav>
-                {isAuthenticated ? (
-                    <button onClick={handleLogout}>로그아웃</button>
-                ) : (
-                    <button onClick={handleLogin}>로그인</button>
-                )}
-                <button onClick={handleSignup}>회원 가입</button>
-            </nav>
-            <main>
-                <QuestionList/>
-            </main>
-        </div>
-    );
+  return (
+    <div style={commonStyles.container}>
+      <nav style={commonStyles.nav}>
+        {user ? (
+          <>
+            <span>Welcome, {user.username}!</span>
+            <Button onClick={handleLogout} variant="secondary">
+              로그아웃
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button onClick={() => navigate('/login')}>로그인</Button>
+            <Button onClick={() => navigate('/signup')}>회원 가입</Button>
+          </>
+        )}
+      </nav>
+      <main>
+        <QuestionList />
+      </main>
+    </div>
+  );
 };
 
 export default MainLayout;
