@@ -2,12 +2,14 @@ package com.ll.restarticlesite.domain.user;
 
 import com.ll.restarticlesite.api.dto.request.ProfileRequest;
 import com.ll.restarticlesite.api.dto.request.answer.AnswerProfileRequest;
+import com.ll.restarticlesite.api.dto.request.comment.CommentProfileRequest;
 import com.ll.restarticlesite.api.dto.request.question.QuestionCreateRequest;
 import com.ll.restarticlesite.api.dto.request.question.QuestionProfileRequest;
 import com.ll.restarticlesite.api.dto.request.user.FindPasswordRequest;
 import com.ll.restarticlesite.api.dto.request.user.UserProfileRequest;
 import com.ll.restarticlesite.api.dto.response.user.FindPasswordResponse;
 import com.ll.restarticlesite.domain.answer.AnswerRepository;
+import com.ll.restarticlesite.domain.comment.CommentRepository;
 import com.ll.restarticlesite.domain.question.QuestionRepository;
 import com.ll.restarticlesite.global.exception.ResourceNotFoundException;
 import jakarta.validation.constraints.NotNull;
@@ -71,9 +73,16 @@ public class UserService {
         List<QuestionProfileRequest> questionProfileRequests = questionRepository.findByUser(user).stream()
                 .map(QuestionProfileRequest::createQuestionProfileRequest)
                 .toList();
+        List<CommentProfileRequest> commentProfileRequests = commentRepository.findByUser(user).stream()
+                .map(CommentProfileRequest::createCommentProfileRequest)
+                .toList();
+
         return ProfileRequest.createProfileRequest(
                 createUserProfileRequest(user),
                 questionProfileRequests,
-                answerProfileRequests);
+                answerProfileRequests,
+                commentProfileRequests);
     }
+
+    private final CommentRepository commentRepository;
 }

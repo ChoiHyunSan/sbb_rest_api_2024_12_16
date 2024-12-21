@@ -116,5 +116,48 @@ export const commonStyles = {
     gap: '10px',
     padding: '10px 0',
     marginBottom: '20px'
+  },
+
+  commentList: {
+    marginTop: '20px',
+    marginBottom: '20px',
+  },
+  
+  commentItem: {
+    padding: '10px',
+    borderBottom: '1px solid #eee',
+    marginBottom: '10px',
+  },
+  
+  answerContent: {
+    padding: '20px',
+    backgroundColor: '#f9f9f9',
+    borderRadius: '5px',
+    marginBottom: '20px',
+    marginTop: '20px'
+  },
+
+  answerMeta: {
+    marginTop: '10px',
+    color: '#666',
+    borderTop: '1px solid #eee',
+    paddingTop: '10px'
+  },
+
+  commentSection: {
+    marginTop: '30px'
+  },
+
+  commentForm: {
+    marginTop: '20px'
+  },
+
+  emptyMessage: {
+    padding: '20px',
+    textAlign: 'center',
+    color: '#666',
+    backgroundColor: '#f9f9f9',
+    borderRadius: '5px',
+    margin: '10px 0'
   }
 }; 

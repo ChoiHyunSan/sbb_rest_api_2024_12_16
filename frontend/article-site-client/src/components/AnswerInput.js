@@ -5,11 +5,13 @@ import { commonStyles } from '../styles/commonStyles';
 import Button from './common/Button';
 import ErrorMessage from './common/ErrorMessage';
 import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const AnswerInput = ({ id, onAnswerSubmit }) => {
   const [content, setContent] = useState('');
   const [error, setError] = useState(null);
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,9 +23,13 @@ const AnswerInput = ({ id, onAnswerSubmit }) => {
     }
 
     try {
-      await api.post(`/api/v1/answers/${id}`, { content });
+      const response = await api.post(`/api/v1/answers/${id}`, { content });
       setContent('');
       onAnswerSubmit();
+
+      navigate(`/answer/${response.data.id}/comments`, { 
+        state: { answer: response.data } 
+      });
     } catch (err) {
       setError(err.message);
     }

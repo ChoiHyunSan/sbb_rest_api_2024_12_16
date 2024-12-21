@@ -169,50 +169,30 @@ const QuestionDetail = () => {
           </select>
         </div>
 
-        <AnswerInput id={id} onAnswerSubmit={fetchQuestionDetail} />
+        <div>
+          <h3>답변 목록</h3>
+          {question.answerPage.content.map(answer => (
+            <div key={answer.id} style={commonStyles.answerItem}>
+              <p>{answer.content}</p>
+              <div style={commonStyles.answerMeta}>
+                <small>
+                  작성자: {answer.author} | 
+                  작성일: {new Date(answer.createdAt).toLocaleDateString()}
+                </small>
+                <Button 
+                  onClick={() => navigate(`/answer/${answer.id}/comments`, { 
+                    state: { answer } 
+                  })}
+                  variant="secondary"
+                >
+                  댓글보기
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
 
-        {question.answerPage.content.map((answer) => (
-          <div key={answer.id} style={styles.answer}>
-            <div style={styles.answerContent}>{answer.content}</div>
-            <div style={styles.answerMeta}>
-              <span>작성자: {answer.author}</span>
-              <span>좋아요: {answer.likes}</span>
-              <span>작성일: {formatDate(answer.createDate)}</span>
-              {answer.modifyDate && (
-                <span>수정일: {formatDate(answer.modifyDate)}</span>
-              )}
-            </div>
-            
-            <div style={styles.buttonGroup}>
-              <Button onClick={() => handleAnswerVote(answer.id)}>
-                추천
-              </Button>
-              {user?.username === answer.author && (
-                <>
-                  <Button
-                    onClick={() => handleAnswerDelete(answer.id)}
-                    variant="secondary"
-                  >
-                    삭제
-                  </Button>
-                  <Button
-                    onClick={() => navigate(`/answer/modify/${answer.id}`, {
-                      state: { 
-                        answer: {
-                          id: answer.id,
-                          content: answer.content
-                        },
-                        questionId: id 
-                      }
-                    })}
-                  >
-                    수정
-                  </Button>
-                </>
-              )}
-            </div>
-          </div>
-        ))}
+        <AnswerInput id={id} onAnswerSubmit={fetchQuestionDetail} />
 
         <div style={commonStyles.pagination}>
           <Button

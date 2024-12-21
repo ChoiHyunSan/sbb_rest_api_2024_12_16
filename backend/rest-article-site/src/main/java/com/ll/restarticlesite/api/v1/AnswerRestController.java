@@ -2,11 +2,14 @@ package com.ll.restarticlesite.api.v1;
 
 import com.ll.restarticlesite.api.dto.request.answer.AnswerCreateRequest;
 import com.ll.restarticlesite.api.dto.request.answer.AnswerListRequest;
+import com.ll.restarticlesite.api.dto.request.comment.CommentCreateRequest;
 import com.ll.restarticlesite.api.dto.response.answer.AnswerCreateResponse;
 import com.ll.restarticlesite.api.dto.response.answer.AnswerListResponse;
 import com.ll.restarticlesite.api.dto.response.answer.AnswerDetailResponse;
+import com.ll.restarticlesite.api.dto.response.comment.CommentDetailResponse;
 import com.ll.restarticlesite.domain.answer.Answer;
 import com.ll.restarticlesite.domain.answer.AnswerService;
+import com.ll.restarticlesite.domain.comment.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -106,4 +109,20 @@ public class AnswerRestController {
         answerService.voteAnswer(principal.getName(), id);
         return ResponseEntity.ok().build();
     }
+
+
+    @GetMapping("comment/{id}")
+    public ResponseEntity<List<CommentDetailResponse>> getComments(@PathVariable Long id){
+        return ResponseEntity.ok().body(answerService.getComments(id));
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/comment/{id}")
+    public ResponseEntity<Void> commentAnswer(@PathVariable Long id,
+                                              Principal principal,
+                                              @RequestBody CommentCreateRequest request){
+        answerService.commentAnswer(principal.getName(), id, request.getContent());
+        return ResponseEntity.ok().build();
+    }
+
 }

@@ -1,9 +1,9 @@
 import React from 'react';
 import { Routes as RouterRoutes, Route } from 'react-router-dom';
 import MainLayout from './components/MainLayout';
+import QuestionList from './components/QuestionList';
 import LoginForm from './components/LoginForm';
 import QuestionDetail from './components/QuestionDetail';
-import QuestionList from './components/QuestionList';
 import QuestionForm from './components/QuestionForm';
 import QuestionModifyForm from './components/QuestionModifyForm';
 import AnswerModifyForm from './components/AnswerModifyForm';
@@ -12,6 +12,7 @@ import PrivateRoute from './components/common/PrivateRoute';
 import FindPasswordForm from './components/FindPasswordForm';
 import ProfilePage from './components/ProfilePage';
 import UpdatePasswordForm from './components/UpdatePasswordForm';
+import AnswerDetail from './components/AnswerDetail';
 
 const Routes = () => {
   return (
@@ -63,6 +64,7 @@ const Routes = () => {
             </PrivateRoute>
           }
         />
+        <Route path="/answer/:answerId/comments" element={<AnswerDetail />} />
       </Route>
     </RouterRoutes>
   );

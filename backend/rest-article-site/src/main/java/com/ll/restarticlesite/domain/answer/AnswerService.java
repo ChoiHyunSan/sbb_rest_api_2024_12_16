@@ -1,9 +1,9 @@
 package com.ll.restarticlesite.domain.answer;
 
-import com.ll.restarticlesite.api.dto.request.answer.AnswerListRequest;
 import com.ll.restarticlesite.api.dto.response.answer.AnswerCreateResponse;
 import com.ll.restarticlesite.api.dto.response.answer.AnswerDetailResponse;
 import com.ll.restarticlesite.api.dto.response.answer.AnswerListResponse;
+import com.ll.restarticlesite.api.dto.response.comment.CommentDetailResponse;
 import com.ll.restarticlesite.domain.question.Question;
 import com.ll.restarticlesite.domain.question.QuestionService;
 import com.ll.restarticlesite.domain.user.User;
@@ -20,6 +20,7 @@ import java.util.List;
 
 import static com.ll.restarticlesite.api.dto.response.answer.AnswerCreateResponse.createAnswerCreateResponse;
 import static com.ll.restarticlesite.domain.answer.QAnswer.answer;
+import static com.ll.restarticlesite.domain.comment.Comment.createComment;
 
 @Service
 @RequiredArgsConstructor
@@ -82,5 +83,19 @@ public class AnswerService {
         User user = userService.findByUsername(username);
         answer.getVoter().add(user);
         answerRepository.save(answer);
+    }
+
+    public void commentAnswer(String name, Long id, String content) {
+        Answer answer = answerRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(RESOURCE_ERROR_MSG));
+        User user = userService.findByUsername(name);
+        answer.getCommentList().add(createComment(answer, user, content));
+        answerRepository.save(answer);
+    }
+
+    public List<CommentDetailResponse> getComments(Long id) {
+        return answerRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(RESOURCE_ERROR_MSG))
+                .getCommentList().stream()
+                .map(CommentDetailResponse::createCommentResponse)
+                .toList();
     }
 }

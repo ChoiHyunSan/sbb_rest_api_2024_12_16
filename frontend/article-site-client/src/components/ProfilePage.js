@@ -5,6 +5,7 @@ import { commonStyles } from '../styles/commonStyles';
 import Button from './common/Button';
 import ErrorMessage from './common/ErrorMessage';
 import { useFormError } from '../hooks/useFormError';
+import { formatDate } from '../utils/dateFormatter';
 
 const ProfilePage = () => {
   const [profile, setProfile] = useState(null);
@@ -62,7 +63,7 @@ const ProfilePage = () => {
             <div key={index} style={styles.listItem}>
               <span style={styles.title}>{question.subject}</span>
               <span style={styles.date}>
-                {new Date(question.createDate).toLocaleDateString()}
+                {formatDate(question.createDate)}
               </span>
             </div>
           ))}
@@ -77,7 +78,22 @@ const ProfilePage = () => {
             <div key={index} style={styles.listItem}>
               <span style={styles.content}>{answer.content}</span>
               <span style={styles.date}>
-                {new Date(answer.createDate).toLocaleDateString()}
+                {formatDate(answer.createDate)}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 댓글 목록 섹션 추가 */}
+      <div style={styles.section}>
+        <h3>작성한 댓글 ({profile.commentProfileRequest.length})</h3>
+        <div style={styles.listSection}>
+          {profile.commentProfileRequest.map((comment, index) => (
+            <div key={index} style={styles.listItem}>
+              <span style={styles.content}>{comment.content}</span>
+              <span style={styles.date}>
+                {formatDate(comment.createDate)}
               </span>
             </div>
           ))}
