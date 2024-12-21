@@ -46,6 +46,8 @@ public class QuestionService {
     public List<QuestionListResponse> getQuestionList(final int page, final String kw, final String sort) {
         return queryFactory.selectFrom(QQuestion.question)
                 .leftJoin(QQuestion.question.user).fetchJoin()
+                .leftJoin(question.user.roles).fetchJoin()
+                .leftJoin(question.answerList).fetchJoin()
                 .where(hasKeyword(kw))
                 .orderBy(getOrderSpecifier(sort))
                 .offset(page * PAGE_SIZE)

@@ -49,7 +49,7 @@ public class Answer extends BaseEntity {
         answer.question = question;
         answer.content = content;
         answer.user = user;
-        question.getAnswerList().add(answer);
+        // question.getAnswerList().add(answer);
         return answer;
     }
 

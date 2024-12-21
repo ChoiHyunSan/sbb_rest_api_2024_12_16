@@ -5,9 +5,6 @@ import com.ll.restarticlesite.domain.answer.Answer;
 import com.ll.restarticlesite.domain.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
-import org.springframework.data.annotation.CreatedDate;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -33,7 +30,7 @@ public class Comment extends BaseEntity {
         comment.answer = answer;
         comment.user = user;
         comment.content = content;
-        answer.getCommentList().add(comment);
+        // answer.getCommentList().add(comment);
         return comment;
     }
 }

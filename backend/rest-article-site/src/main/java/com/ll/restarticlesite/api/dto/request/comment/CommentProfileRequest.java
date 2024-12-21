@@ -1,6 +1,7 @@
 package com.ll.restarticlesite.api.dto.request.comment;
 
 import com.ll.restarticlesite.domain.comment.Comment;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -8,6 +9,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
+@AllArgsConstructor
 public class CommentProfileRequest {
     private String content;
     private LocalDateTime createdAt;
