@@ -145,6 +145,11 @@ public class QuestionRestController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * 권한 인증 필요 X
+     * @param id 질문 ID
+     * @return 조회수 증가에 대한 상태코드 반환
+     */
     @PostMapping("/{id}/views")
     public ResponseEntity<Void> viewQuestion(@PathVariable Long id){
         questionService.addViews(id);

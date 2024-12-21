@@ -35,7 +35,6 @@ public class UserRestController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/edit")
     public ResponseEntity<Void> requestUserUpdate(){
-        // TODO : 로그인 상태라면 회원 수정 폼으로 이동하도록 허용
         return ResponseEntity.ok().build();
     }
 
@@ -47,7 +46,6 @@ public class UserRestController {
     @PreAuthorize("isAuthenticated()")
     @PutMapping
     public ResponseEntity<Void> updateUser(@RequestBody UserPasswordUpdateRequest request){
-        // TODO : 입력 값을 통해 기존 비밀번호와 대조 후, 동일하다면 새롭게 받은 비밀번호로 갱신한다.
         userService.modifyPassword("user1",
                 request.getOldPassword(),
                 request.getNewPassword(),
@@ -67,10 +65,13 @@ public class UserRestController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * 권한 인증 필요
+     * @return 로그인 상태에 대한 상태코드 반환
+     */
     @GetMapping("/status")
     public ResponseEntity<?> checkAuthStatus(Principal principal) {
         if (principal != null) {
-            // 사용자 정보를 포함한 응답
             Map<String, Object> response = new HashMap<>();
             response.put("username", principal.getName());
             return ResponseEntity.ok(response);
@@ -78,11 +79,20 @@ public class UserRestController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
+    /**
+     * 권한 인증 필요
+     * @return 프로필 정보 및 상태코드 반환
+     */
     @GetMapping("/profile")
     public ResponseEntity<ProfileRequest> profile(Principal principal) {
         return ResponseEntity.ok().body(userService.getProfile(principal.getName()));
     }
 
+    /**
+     * 권한 인증 필요
+     * @param request 기존 비밀번호 및 새 비밀번호 값
+     * @return 비밀번호 변경에 대한 상태코드 반환
+     */
     @PutMapping("/update-password")
     public ResponseEntity<Void> updatePassword(Principal principal,
                                                @Valid @RequestBody UserPasswordUpdateRequest request) {

@@ -82,12 +82,9 @@ public class QuestionService {
         };
     }
 
+    @Transactional
     public Optional<QuestionDetailResponse> getQuestionDetail(final Long id, final int answerPage, final String sort) {
-        Optional<Question> questionOpt = questionRepository.findById(id);
-        if(questionOpt.isEmpty()){
-            throw new ResourceNotFoundException("Question not found");
-        }
-        Question question = questionOpt.get();
+        Question question = getQuestion(id);
         question.addViews();
         questionRepository.save(question);
         return Optional.of(createQuestionDetailResponse(question,
@@ -103,13 +100,9 @@ public class QuestionService {
                 : comparingInt(a -> -a.getVoter().size());
     }
 
+    @Transactional
     public QuestionCreateResponse getCreateResponse(final Long id) {
-        Optional<Question> byId = questionRepository.findById(id);
-        if(byId.isEmpty()){
-            throw new ResourceNotFoundException(RESOURCE_ERROR_MSG);
-        }
-        Question question = byId.get();
-
+        Question question = getQuestion(id);
         return createQuestionCreateResponse(
                 question.getCategory(),
                 question.getSubject(),
@@ -117,39 +110,46 @@ public class QuestionService {
         );
     }
 
+    @Transactional
     public Question createQuestion(final String username, final String subject, final String content, final Category category) {
-        User byUsername = userService.findByUsername(username);
+        User byUsername = userService.getUser(username);
         log.info(byUsername.getUsername());
         Question question = Question.createQuestion(byUsername, subject, content, category);
         return questionRepository.save(question);
     }
 
+    @Transactional
     public void modifyQuestion(Long id, String subject, String content, Category category) {
-        Question question = questionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(RESOURCE_ERROR_MSG));
+        Question question = getQuestion(id);
         question.modify(subject, content, category);
         questionRepository.save(question);
     }
 
+    @Transactional
     public void deleteQuestion(String username, Long id) {
-        Question question = questionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(RESOURCE_ERROR_MSG));
-        if(!question.getUser().getUsername().equals(username)){
-            throw new UnauthorizedException("유저와 질문의 작성자가 일치하지 않습니다. 유저 : " + username + ", 질문 : " + question.getUser().getUsername());
-        }
+        Question question = getQuestion(id);
+        checkUserExtracted(username, question);
         questionRepository.delete(question);
     }
 
+    @Transactional
     public void voteQuestion(String username, Long id) {
-        Question question = questionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(RESOURCE_ERROR_MSG));
-        User user = userService.findByUsername(username);
+        Question question = getQuestion(id);
+        User user = userService.getUser(username);
         question.getVoter().add(user);
         questionRepository.save(question);
     }
 
-    public Question findById(Long questionId) {
-        return questionRepository.findById(questionId).orElseThrow(() -> new ResourceNotFoundException(RESOURCE_ERROR_MSG));
+    private static void checkUserExtracted(String username, Question question) {
+        if(!question.getUser().getUsername().equals(username)){
+            throw new UnauthorizedException("작성자가 일치하지 않습니다. 현재 로그인 : " + username + ", 작성자 : " + question.getUser().getUsername());
+        }
     }
 
-    @Transactional
+    public Question getQuestion(Long questionId) {
+        return questionRepository.findById(questionId).orElseThrow(() -> new ResourceNotFoundException(RESOURCE_ERROR_MSG));
+    }
+    
     public void addViews(Long id) {
         Question question = questionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(RESOURCE_ERROR_MSG));
         question.addViews();

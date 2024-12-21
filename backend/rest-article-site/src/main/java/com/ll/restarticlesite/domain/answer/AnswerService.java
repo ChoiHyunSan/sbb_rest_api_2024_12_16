@@ -11,6 +11,7 @@ import com.ll.restarticlesite.domain.user.UserService;
 import com.ll.restarticlesite.global.exception.ResourceNotFoundException;
 import com.ll.restarticlesite.global.exception.UnauthorizedException;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +34,7 @@ public class AnswerService {
     private final JPAQueryFactory queryFactory;
     private final static String RESOURCE_ERROR_MSG = "Answer Resource Not Found";
 
+    @Transactional
     public List<AnswerListResponse> getAnswerResponsePage(final int page) {
         Pageable pageable = PageRequest.of(page, ANSWER_PAGE_SIZE);
         return queryFactory
@@ -47,55 +49,63 @@ public class AnswerService {
                 .toList();
     }
 
+    @Transactional
     public Answer createAnswer(final String username, final Long questionId,final String content) {
-        Question question = questionService.findById(questionId);
-        User user = userService.findByUsername(username);
+        Question question = questionService.getQuestion(questionId);
+        User user = userService.getUser(username);
         return answerRepository.save(Answer.createAnswer(question, content, user));
     }
 
+    @Transactional
     public AnswerCreateResponse getAnswerCreateResponse(String username, Long id) {
-        Answer answer = answerRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(RESOURCE_ERROR_MSG));
-        if(!answer.getUser().getUsername().equals(username)) {
-            throw new UnauthorizedException("현재 접속한 유저가 작성한 글이 아닙니다. Username : " + username + " Answer Id : " + id);
-        }
+        Answer answer = getAnswer(id);
+        checkUserExtracted(username, id, answer);
         return createAnswerCreateResponse(answer);
     }
 
+    @Transactional
     public AnswerDetailResponse modifyAnswer(String username, Long id, String content) {
-        Answer answer = answerRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(RESOURCE_ERROR_MSG));
-        if(!answer.getUser().getUsername().equals(username)) {
-            throw new UnauthorizedException("현재 접속한 유저가 작성한 글이 아닙니다. Username : " + username + " Answer Id : " + id);
-        }
+        Answer answer = getAnswer(id);
+        checkUserExtracted(username, id, answer);
         answer.modify(content);
         return AnswerDetailResponse.createAnswerResponse(answerRepository.save(answer));
     }
 
+    @Transactional
     public void deleteAnswer(String username, Long id) {
-        Answer answer = answerRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(RESOURCE_ERROR_MSG));
-        if(!answer.getUser().getUsername().equals(username)){
-            throw new UnauthorizedException("유저와 답변의 작성자가 일치하지 않습니다. 유저 : " + username + ", 답변 : " + answer.getUser().getUsername());
-        }
+        Answer answer = getAnswer(id);
+        checkUserExtracted(username, id, answer);
         answerRepository.delete(answer);
     }
 
     public void voteAnswer(String username, Long id) {
-        Answer answer = answerRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(RESOURCE_ERROR_MSG));
-        User user = userService.findByUsername(username);
+        Answer answer = getAnswer(id);
+        User user = userService.getUser(username);
         answer.getVoter().add(user);
         answerRepository.save(answer);
     }
 
     public void commentAnswer(String name, Long id, String content) {
-        Answer answer = answerRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(RESOURCE_ERROR_MSG));
-        User user = userService.findByUsername(name);
+        Answer answer = getAnswer(id);
+        User user = userService.getUser(name);
         answer.getCommentList().add(createComment(answer, user, content));
         answerRepository.save(answer);
     }
 
     public List<CommentDetailResponse> getComments(Long id) {
-        return answerRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(RESOURCE_ERROR_MSG))
+        return getAnswer(id)
                 .getCommentList().stream()
                 .map(CommentDetailResponse::createCommentResponse)
                 .toList();
+    }
+
+    private Answer getAnswer(Long id) {
+        return answerRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(RESOURCE_ERROR_MSG));
+    }
+
+    private static void checkUserExtracted(String username, Long id, Answer answer) {
+        if(!answer.getUser().getUsername().equals(username)) {
+            throw new UnauthorizedException("현재 접속한 유저가 작성한 글이 아닙니다. Username : " + username + " Answer Id : " + id);
+        }
     }
 }

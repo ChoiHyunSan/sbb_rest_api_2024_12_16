@@ -9,7 +9,6 @@ import com.ll.restarticlesite.api.dto.response.answer.AnswerDetailResponse;
 import com.ll.restarticlesite.api.dto.response.comment.CommentDetailResponse;
 import com.ll.restarticlesite.domain.answer.Answer;
 import com.ll.restarticlesite.domain.answer.AnswerService;
-import com.ll.restarticlesite.domain.comment.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -110,12 +109,22 @@ public class AnswerRestController {
         return ResponseEntity.ok().build();
     }
 
-
+    /**
+     * 권한 인증 불필요
+     * @param id 답변 ID
+     * @return 댓글 정보 및 상태코드 반환
+     */
     @GetMapping("comment/{id}")
     public ResponseEntity<List<CommentDetailResponse>> getComments(@PathVariable Long id){
         return ResponseEntity.ok().body(answerService.getComments(id));
     }
 
+    /**
+     * 권한 인증 필요
+     * @param id 답변 ID
+     * @param request 댓글 입력 값
+     * @return 상태코드 반환
+     */
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/comment/{id}")
     public ResponseEntity<Void> commentAnswer(@PathVariable Long id,
