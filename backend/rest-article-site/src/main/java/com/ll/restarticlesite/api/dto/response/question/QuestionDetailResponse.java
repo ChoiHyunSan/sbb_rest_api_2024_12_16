@@ -25,7 +25,7 @@ public class QuestionDetailResponse {
     private Integer likes;
     private Long views;
 
-    public static QuestionDetailResponse createQuestionDetailResponse(Question question, int pageNum, int size, Comparator<Answer> cmp) {
+    public static QuestionDetailResponse createQuestionDetailResponse(Question question, int pageNum, int size, int likes, Comparator<Answer> cmp) {
         return QuestionDetailResponse.builder()
                 .id(question.getId())
                 .subject(question.getSubject())
@@ -34,7 +34,7 @@ public class QuestionDetailResponse {
                 .author(question.getUser().getUsername())
                 .modifyDate(question.getModifiedAt())
                 .answerPage(AnswerDetailResponse.answerResponsePagingList(question.getAnswerList(), pageNum, size, cmp))
-                .likes(question.getVoter().size())
+                .likes(likes)
                 .answerCount(question.getAnswerList().size())
                 .views(question.getViews())
                 .build();

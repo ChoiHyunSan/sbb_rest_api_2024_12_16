@@ -30,7 +30,7 @@ public class UserService {
     public void modifyPassword(String username, String oldPassword, String newPassword, String oldPassword1) {
         User user = getUser(username);
         if(!passwordEncoder.matches(oldPassword, user.getPassword()) || !newPassword.equals(oldPassword1)) {
-            throw new InvalidInputException("Email Not Equal");
+            throw new InvalidInputException("Passwords do not match");
         }
         user.modifyPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
@@ -39,7 +39,7 @@ public class UserService {
     @Transactional
     public void createUser(String username, String email, String password1, String password2) {
         if(!password1.equals(password2)) {
-            throw new InvalidInputException("Email Not Equal");
+            throw new InvalidInputException("Passwords do not match");
         }
 
         User user = User.createUser(username, email, passwordEncoder.encode(password1));

@@ -47,7 +47,6 @@ public class QuestionService {
         return queryFactory.selectFrom(QQuestion.question)
                 .leftJoin(QQuestion.question.user).fetchJoin()
                 .leftJoin(question.user.roles).fetchJoin()
-                .leftJoin(question.answerList).fetchJoin()
                 .where(hasKeyword(kw))
                 .orderBy(getOrderSpecifier(sort))
                 .offset(page * PAGE_SIZE)
@@ -86,12 +85,27 @@ public class QuestionService {
 
     @Transactional
     public Optional<QuestionDetailResponse> getQuestionDetail(final Long id, final int answerPage, final String sort) {
-        Question question = getQuestion(id);
-        question.addViews();
-        questionRepository.save(question);
-        return Optional.of(createQuestionDetailResponse(question,
+        Question questionObject = queryFactory
+                .selectFrom(QQuestion.question)
+                .leftJoin(question.user).fetchJoin()
+                .where(question.id.eq(id))
+                .fetchOne();
+
+        if (questionObject == null) {
+            throw new ResourceNotFoundException(RESOURCE_ERROR_MSG);
+        }
+
+        Integer voterCount = queryFactory
+                .select(question.voter.size())
+                .from(QQuestion.question)
+                .where(question.id.eq(id))
+                .fetchOne();
+        questionObject.addViews();
+
+        return Optional.of(createQuestionDetailResponse(questionObject,
                 answerPage,
                 ANSWER_PAGE_SIZE,
+                voterCount != null ? voterCount : 0,
                 getComparator(sort)));
     }
 
@@ -153,7 +167,7 @@ public class QuestionService {
     }
     
     public void addViews(Long id) {
-        Question question = questionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(RESOURCE_ERROR_MSG));
+        Question question = getQuestion(id);
         question.addViews();
         questionRepository.save(question);
     }
