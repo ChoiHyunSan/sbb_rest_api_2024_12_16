@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
-import { commonStyles } from '../styles/commonStyles';
 import Button from './common/Button';
 import ErrorMessage from './common/ErrorMessage';
 
@@ -47,65 +46,95 @@ const SignupForm = () => {
   };
 
   return (
-    <div style={commonStyles.container}>
-      <h2>회원가입</h2>
-      <Button onClick={() => navigate('/')}>목록으로</Button>
+    <div className="max-w-md mx-auto p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold">회원가입</h2>
+        <Button 
+          onClick={() => navigate('/')}
+          variant="secondary"
+        >
+          목록으로
+        </Button>
+      </div>
+
       <ErrorMessage message={error} />
 
-      <form onSubmit={handleSubmit} style={commonStyles.form}>
-        <div style={commonStyles.formGroup}>
-          <label htmlFor="username">사용자 이름:</label>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div>
+          <label 
+            htmlFor="username"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            사용자 이름:
+          </label>
           <input
             type="text"
             id="username"
             name="username"
             value={formData.username}
             onChange={handleChange}
-            style={commonStyles.input}
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             required
           />
         </div>
 
-        <div style={commonStyles.formGroup}>
-          <label htmlFor="email">이메일:</label>
+        <div>
+          <label 
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            이메일:
+          </label>
           <input
             type="email"
             id="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
-            style={commonStyles.input}
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             required
           />
         </div>
 
-        <div style={commonStyles.formGroup}>
-          <label htmlFor="password">비밀번호:</label>
+        <div>
+          <label 
+            htmlFor="password"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            비밀번호:
+          </label>
           <input
             type="password"
             id="password"
             name="password"
             value={formData.password}
             onChange={handleChange}
-            style={commonStyles.input}
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             required
           />
         </div>
 
-        <div style={commonStyles.formGroup}>
-          <label htmlFor="passwordCheck">비밀번호 확인:</label>
+        <div>
+          <label 
+            htmlFor="passwordCheck"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            비밀번호 확인:
+          </label>
           <input
             type="password"
             id="passwordCheck"
             name="passwordCheck"
             value={formData.passwordCheck}
             onChange={handleChange}
-            style={commonStyles.input}
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             required
           />
         </div>
 
-        <Button type="submit">회원가입</Button>
+        <Button type="submit" className="w-full">
+          회원가입
+        </Button>
       </form>
     </div>
   );

@@ -1,163 +1,35 @@
-// 공통으로 사용되는 스타일 정의
 export const commonStyles = {
   container: {
+    padding: '20px',
     maxWidth: '800px',
     margin: '0 auto',
-    padding: '20px'
   },
-  
-  button: {
-    padding: '8px 16px',
-    backgroundColor: '#4CAF50',
-    color: 'white', 
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer'
+  formGroup: {
+    marginBottom: '1rem',
   },
-
   input: {
     width: '100%',
-    padding: '8px',
-    marginTop: '8px',
+    padding: '0.5rem',
+    marginTop: '0.25rem',
     border: '1px solid #ddd',
-    borderRadius: '4px'
+    borderRadius: '4px',
   },
-
   textarea: {
     width: '100%',
-    minHeight: '150px',
-    padding: '12px',
-    marginBottom: '10px',
+    padding: '0.5rem',
+    marginTop: '0.25rem',
     border: '1px solid #ddd',
     borderRadius: '4px',
-    resize: 'vertical'
+    minHeight: '200px',
   },
-
-  formGroup: {
-    marginBottom: '20px'
-  },
-
-  errorMessage: {
-    color: 'red',
-    marginBottom: '10px',
-    textAlign: 'center'
-  },
-
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse',
-    marginTop: '20px'
-  },
-
-  tableHeader: {
-    padding: '12px',
-    backgroundColor: '#f8f9fa',
-    borderBottom: '2px solid #dee2e6',
-    textAlign: 'left'
-  },
-
-  tableRow: {
-    borderBottom: '1px solid #dee2e6'
-  },
-
-  tableCell: {
-    padding: '12px'
-  },
-
-  link: {
-    textDecoration: 'none',
-    color: '#2c3e50'
-  },
-
-  controls: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '20px'
-  },
-
-  searchForm: {
-    display: 'flex',
-    gap: '10px'
-  },
-
-  select: {
-    padding: '8px',
-    border: '1px solid #ddd',
-    borderRadius: '4px',
-    backgroundColor: 'white'
-  },
-
-  pagination: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: '20px',
-    gap: '10px'
-  },
-
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px',
-    marginTop: '20px'
-  },
-
   buttonGroup: {
     display: 'flex',
     justifyContent: 'flex-end',
-    gap: '10px',
-    marginTop: '20px'
+    gap: '1rem',
+    marginTop: '1rem',
   },
-
-  nav: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    gap: '10px',
-    padding: '10px 0',
-    marginBottom: '20px'
-  },
-
-  commentList: {
-    marginTop: '20px',
-    marginBottom: '20px',
-  },
-  
-  commentItem: {
-    padding: '10px',
-    borderBottom: '1px solid #eee',
-    marginBottom: '10px',
-  },
-  
-  answerContent: {
-    padding: '20px',
-    backgroundColor: '#f9f9f9',
-    borderRadius: '5px',
-    marginBottom: '20px',
-    marginTop: '20px'
-  },
-
-  answerMeta: {
-    marginTop: '10px',
-    color: '#666',
-    borderTop: '1px solid #eee',
-    paddingTop: '10px'
-  },
-
-  commentSection: {
-    marginTop: '30px'
-  },
-
-  commentForm: {
-    marginTop: '20px'
-  },
-
-  emptyMessage: {
-    padding: '20px',
-    textAlign: 'center',
-    color: '#666',
-    backgroundColor: '#f9f9f9',
-    borderRadius: '5px',
-    margin: '10px 0'
+  errorMessage: {
+    color: 'red',
+    marginBottom: '1rem',
   }
 }; 

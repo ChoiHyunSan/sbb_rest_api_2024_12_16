@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
-import { commonStyles } from '../styles/commonStyles';
 import Button from './common/Button';
 import ErrorMessage from './common/ErrorMessage';
 import { useFormError } from '../hooks/useFormError';
@@ -58,41 +57,45 @@ const FindPasswordForm = () => {
   };
 
   return (
-    <div style={commonStyles.container}>
-      <h2>비밀번호 찾기</h2>
-      <Button onClick={() => navigate('/')}>목록으로</Button>
+    <div className="max-w-md mx-auto p-6">
+      <h2 className="text-2xl font-bold mb-6">비밀번호 찾기</h2>
+      <Button onClick={() => navigate('/')} className="mb-6">목록으로</Button>
       {generalError && <ErrorMessage message={generalError} />}
 
-      <form onSubmit={handleSubmit} style={commonStyles.form} noValidate>
-        <div style={commonStyles.formGroup}>
-          <label htmlFor="username">닉네임:</label>
+      <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+        <div className="space-y-2">
+          <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+            닉네임:
+          </label>
           <input
             type="text"
             id="username"
             name="username"
             value={formData.username}
             onChange={handleChange}
-            style={commonStyles.input}
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             required
           />
           {errors.username && <ErrorMessage message={errors.username} />}
         </div>
 
-        <div style={commonStyles.formGroup}>
-          <label htmlFor="email">이메일:</label>
+        <div className="space-y-2">
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            이메일:
+          </label>
           <input
             type="email"
             id="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
-            style={commonStyles.input}
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             required
           />
           {errors.email && <ErrorMessage message={errors.email} />}
         </div>
 
-        <Button type="submit">비밀번호 찾기</Button>
+        <Button type="submit" className="w-full">비밀번호 찾기</Button>
       </form>
     </div>
   );

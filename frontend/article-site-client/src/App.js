@@ -6,11 +6,13 @@ import Routes from './Routes';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <Routes />
-      </Router>
-    </AuthProvider>
+    <div className="min-h-screen bg-gray-50">
+      <AuthProvider>
+        <Router>
+          <Routes />
+        </Router>
+      </AuthProvider>
+    </div>
   );
 }
 

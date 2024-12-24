@@ -2,8 +2,6 @@
 import React from 'react';
 import { useNavigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { commonStyles } from '../styles/commonStyles';
-import Button from './common/Button';
 
 const MainLayout = () => {
   const navigate = useNavigate();
@@ -19,63 +17,80 @@ const MainLayout = () => {
   };
 
   return (
-    <div style={commonStyles.container}>
-      <nav style={styles.nav}>
-        <div style={styles.leftNav}>
-          <Button onClick={() => navigate('/list')}>질문 목록</Button>
-          {user && (
-            <Button onClick={() => navigate('/question/new')}>질문 작성</Button>
-          )}
-        </div>
-        <div style={styles.rightNav}>
-          {user ? (
-            <>
-              <span style={styles.username}>{user.username}님</span>
-              <Button onClick={() => navigate('/profile')}>프로필</Button>
-              <Button onClick={() => navigate('/update-password')}>비밀번호 변경</Button>
-              <Button onClick={handleLogout}>로그아웃</Button>
-            </>
-          ) : (
-            <>
-              <Button onClick={() => navigate('/login')}>로그인</Button>
-              <Button onClick={() => navigate('/signup')}>회원가입</Button>
-              <Button onClick={() => navigate('/find-password')}>비밀번호 찾기</Button>
-            </>
-          )}
+    <div className="min-h-screen bg-gray-50">
+      <nav className="bg-white shadow-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex space-x-4 items-center">
+              <button 
+                onClick={() => navigate('/list')}
+                className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+              >
+                질문 목록
+              </button>
+              {user && (
+                <button 
+                  onClick={() => navigate('/question/new')}
+                  className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  질문 작성
+                </button>
+              )}
+            </div>
+            <div className="flex items-center space-x-4">
+              {user ? (
+                <>
+                  <span className="text-gray-700">{user.username}님</span>
+                  <button 
+                    onClick={() => navigate('/profile')}
+                    className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    프로필
+                  </button>
+                  <button 
+                    onClick={() => navigate('/update-password')}
+                    className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    비밀번호 변경
+                  </button>
+                  <button 
+                    onClick={handleLogout}
+                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium"
+                  >
+                    로그아웃
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button 
+                    onClick={() => navigate('/login')}
+                    className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium"
+                  >
+                    로그인
+                  </button>
+                  <button 
+                    onClick={() => navigate('/signup')}
+                    className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium"
+                  >
+                    회원가입
+                  </button>
+                  <button 
+                    onClick={() => navigate('/find-password')}
+                    className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    비밀번호 찾기
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       </nav>
-      <main style={styles.main}>
+      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <Outlet />
       </main>
     </div>
   );
-};
-
-const styles = {
-  nav: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '1rem',
-    backgroundColor: '#f8f9fa',
-    marginBottom: '2rem'
-  },
-  leftNav: {
-    display: 'flex',
-    gap: '1rem'
-  },
-  rightNav: {
-    display: 'flex',
-    gap: '1rem',
-    alignItems: 'center'
-  },
-  username: {
-    marginRight: '1rem',
-    fontWeight: 'bold'
-  },
-  main: {
-    padding: '20px'
-  }
 };
 
 export default MainLayout;

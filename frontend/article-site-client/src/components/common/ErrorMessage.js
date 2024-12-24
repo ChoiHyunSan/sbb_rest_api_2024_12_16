@@ -1,12 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { commonStyles } from '../../styles/commonStyles';
 
 const ErrorMessage = ({ message }) => {
   if (!message) return null;
   
   return (
-    <div style={commonStyles.errorMessage}>
+    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
       {message}
     </div>
   );

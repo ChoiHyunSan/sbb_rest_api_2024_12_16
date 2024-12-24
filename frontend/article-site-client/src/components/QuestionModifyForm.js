@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { api } from '../services/api';
-import { commonStyles } from '../styles/commonStyles';
 import Button from './common/Button';
 import ErrorMessage from './common/ErrorMessage';
 import { useFormError } from '../hooks/useFormError';
@@ -62,23 +61,25 @@ const QuestionModifyForm = () => {
     }));
   };
 
-  if (loading) return <div>로딩중...</div>;
+  if (loading) return <div className="text-center py-8">로딩중...</div>;
 
   return (
-    <div style={commonStyles.container}>
-      <h2>질문 수정</h2>
-      <Button onClick={() => navigate(-1)}>뒤로가기</Button>
+    <div className="max-w-4xl mx-auto p-6">
+      <h2 className="text-2xl font-bold mb-6">질문 수정</h2>
+      <Button onClick={() => navigate(-1)} className="mb-6">뒤로가기</Button>
       {generalError && <ErrorMessage message={generalError} />}
 
-      <form onSubmit={handleSubmit} style={commonStyles.form}>
-        <div style={commonStyles.formGroup}>
-          <label htmlFor="category">카테고리:</label>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="space-y-2">
+          <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+            카테고리:
+          </label>
           <select
             id="category"
             name="category"
             value={formData.category || ''}
             onChange={handleChange}
-            style={commonStyles.select}
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             required
           >
             <option value="">카테고리 선택</option>
@@ -91,34 +92,38 @@ const QuestionModifyForm = () => {
           {errors.category && <ErrorMessage message={errors.category} />}
         </div>
 
-        <div style={commonStyles.formGroup}>
-          <label htmlFor="subject">제목:</label>
+        <div className="space-y-2">
+          <label htmlFor="subject" className="block text-sm font-medium text-gray-700">
+            제목:
+          </label>
           <input
             type="text"
             id="subject"
             name="subject"
             value={formData.subject}
             onChange={handleChange}
-            style={commonStyles.input}
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             required
           />
           {errors.subject && <ErrorMessage message={errors.subject} />}
         </div>
 
-        <div style={commonStyles.formGroup}>
-          <label htmlFor="content">내용:</label>
+        <div className="space-y-2">
+          <label htmlFor="content" className="block text-sm font-medium text-gray-700">
+            내용:
+          </label>
           <textarea
             id="content"
             name="content"
             value={formData.content}
             onChange={handleChange}
-            style={commonStyles.textarea}
+            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[200px]"
             required
           />
           {errors.content && <ErrorMessage message={errors.content} />}
         </div>
 
-        <div style={commonStyles.buttonGroup}>
+        <div className="flex justify-end space-x-4">
           <Button type="submit">수정하기</Button>
         </div>
       </form>

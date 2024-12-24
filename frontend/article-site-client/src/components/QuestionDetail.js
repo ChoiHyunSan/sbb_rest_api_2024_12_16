@@ -10,37 +10,24 @@ import { formatDate } from '../utils/dateFormatter';
 
 const QuestionDetail = () => {
   const { id } = useParams();
-  const [question, setQuestion] = useState(null);
-  const [answerPage, setAnswerPage] = useState(0);
-  const [sort, setSort] = useState('latest');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const navigate = useNavigate();
   const { user } = useAuth();
-  const isFirstRender = useRef(true);
-  const [totalPages, setTotalPages] = useState(0);
+  
+  const [question, setQuestion] = useState(null);
+  const [error, setError] = useState(null);
 
-  const fetchQuestionDetail = useCallback(async () => {
+  const fetchQuestionDetail = async () => {
     try {
-      const queryParams = new URLSearchParams({
-        answerPage,
-        sort
-      });
-
-      const response = await api.get(`/api/v1/questions/${id}?${queryParams}`);
+      const response = await api.get(`/api/v1/questions/${id}`);
       setQuestion(response.data);
-      setTotalPages(response.data.answerPage.totalPages);
-      setError(null);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      setError(error.message);
     }
-  }, [id, answerPage, sort]);
+  };
 
   useEffect(() => {
     fetchQuestionDetail();
-  }, [fetchQuestionDetail]);
+  }, [id]);
 
   useEffect(() => {
     const incrementViews = async () => {
@@ -54,16 +41,16 @@ const QuestionDetail = () => {
     incrementViews();
   }, [id]);
 
-  const handleDelete = async () => {
-    if (!window.confirm('정말 삭제하시겠습니까?')) return;
-
+  const handleDelete = useCallback(async () => {
+    if (!window.confirm('정말로 삭제하시겠습니까?')) return;
+    
     try {
       await api.delete(`/api/v1/questions/${id}`);
-      navigate('/');
-    } catch (err) {
-      setError(err.message);
+      navigate('/list');
+    } catch (error) {
+      setError('질문 삭제에 실패했습니다.');
     }
-  };
+  }, [id, navigate]);
 
   const handleVote = async () => {
     try {
@@ -95,31 +82,21 @@ const QuestionDetail = () => {
   };
 
   const handlePrevPage = () => {
-    if (answerPage > 0) {
-      setAnswerPage(prev => prev - 1);
+    if (question.answerPage.currentPage > 0) {
+      question.answerPage.currentPage -= 1;
     }
   };
 
   const handleNextPage = () => {
-    if (answerPage < totalPages - 1) {
-      setAnswerPage(prev => prev + 1);
+    if (question.answerPage.currentPage < question.answerPage.totalPages - 1) {
+      question.answerPage.currentPage += 1;
     }
   };
 
-  const handleModify = () => {
-    navigate(`/question/modify/${id}`, { 
-      state: { 
-        question: {
-          id,
-          subject: question.subject,
-          content: question.content,
-          category: question.category
-        } 
-      }
-    });
-  };
+  const handleEdit = useCallback(() => {
+    navigate(`/question/modify/${id}`);
+  }, [id, navigate]);
 
-  if (loading) return <div>로딩중...</div>;
   if (error) return <ErrorMessage message={error} />;
   if (!question) return <div>질문을 찾을 수 없습니다.</div>;
 
@@ -148,7 +125,7 @@ const QuestionDetail = () => {
               <Button onClick={handleDelete} variant="secondary">
                 삭제
               </Button>
-              <Button onClick={handleModify}>
+              <Button onClick={handleEdit}>
                 수정
               </Button>
             </>
@@ -160,8 +137,8 @@ const QuestionDetail = () => {
         <div style={styles.answerHeader}>
           <h2>답변 {question.answerCount}개</h2>
           <select
-            value={sort}
-            onChange={(e) => setSort(e.target.value)}
+            value={question.answerPage.sort}
+            onChange={(e) => question.answerPage.sort = e.target.value}
             style={commonStyles.select}
           >
             <option value="latest">최신순</option>
@@ -197,16 +174,16 @@ const QuestionDetail = () => {
         <div style={commonStyles.pagination}>
           <Button
             onClick={handlePrevPage}
-            disabled={answerPage === 0}
+            disabled={question.answerPage.currentPage === 0}
           >
             이전
           </Button>
           <span>
-            페이지 {answerPage + 1} / {totalPages}
+            페이지 {question.answerPage.currentPage + 1} / {question.answerPage.totalPages}
           </span>
           <Button
             onClick={handleNextPage}
-            disabled={answerPage >= totalPages - 1}
+            disabled={question.answerPage.currentPage >= question.answerPage.totalPages - 1}
           >
             다음
           </Button>

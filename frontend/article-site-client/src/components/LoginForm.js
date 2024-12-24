@@ -32,7 +32,7 @@ const LoginForm = () => {
           handleError(error);  // 에러 처리
         });
     }
-  }, [location, handleOAuthLogin, navigate]);
+  }, [location.search, handleOAuthLogin, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

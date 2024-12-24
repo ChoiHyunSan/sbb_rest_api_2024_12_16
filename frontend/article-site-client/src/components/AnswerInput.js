@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { api } from '../services/api';
-import { commonStyles } from '../styles/commonStyles';
 import Button from './common/Button';
 import ErrorMessage from './common/ErrorMessage';
 import { useAuth } from '../contexts/AuthContext';
@@ -36,19 +35,19 @@ const AnswerInput = ({ id, onAnswerSubmit }) => {
   };
 
   return (
-    <div style={commonStyles.container}>
-      <h3>답변 작성</h3>
+    <div className="bg-white rounded-lg shadow-md p-6 mt-8">
+      <h3 className="text-xl font-semibold mb-4">답변 작성</h3>
       <ErrorMessage message={error} />
       
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="space-y-4">
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="답변을 입력해주세요"
-          style={commonStyles.textarea}
+          className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[200px]"
           required
         />
-        <Button type="submit">
+        <Button type="submit" className="w-full">
           답변 등록
         </Button>
       </form>
