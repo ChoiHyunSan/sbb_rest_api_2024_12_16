@@ -1,4 +1,4 @@
-package com.ll.restarticlesite.global;
+package com.ll.restarticlesite.global.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;

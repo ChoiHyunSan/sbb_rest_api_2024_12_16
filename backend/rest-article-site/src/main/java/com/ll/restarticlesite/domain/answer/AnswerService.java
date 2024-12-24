@@ -8,8 +8,8 @@ import com.ll.restarticlesite.domain.question.Question;
 import com.ll.restarticlesite.domain.question.QuestionService;
 import com.ll.restarticlesite.domain.user.User;
 import com.ll.restarticlesite.domain.user.UserService;
+import com.ll.restarticlesite.global.service.AuthorizationService;
 import com.ll.restarticlesite.global.exception.ResourceNotFoundException;
-import com.ll.restarticlesite.global.exception.UnauthorizedException;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +33,7 @@ public class AnswerService {
     private final static int ANSWER_PAGE_SIZE = 10;
     private final JPAQueryFactory queryFactory;
     private final static String RESOURCE_ERROR_MSG = "Answer Resource Not Found";
+    private final AuthorizationService authorizationService;
 
     @Transactional
     public List<AnswerListResponse> getAnswerResponsePage(final int page) {
@@ -59,14 +60,14 @@ public class AnswerService {
     @Transactional
     public AnswerCreateResponse getAnswerCreateResponse(String username, Long id) {
         Answer answer = getAnswer(id);
-        checkUserExtracted(username, id, answer);
+        authorizationService.checkResourceOwner(username, answer);
         return createAnswerCreateResponse(answer);
     }
 
     @Transactional
     public AnswerDetailResponse modifyAnswer(String username, Long id, String content) {
         Answer answer = getAnswer(id);
-        checkUserExtracted(username, id, answer);
+        authorizationService.checkResourceOwner(username, answer);
         answer.modify(content);
         return AnswerDetailResponse.createAnswerResponse(answerRepository.save(answer));
     }
@@ -74,7 +75,7 @@ public class AnswerService {
     @Transactional
     public void deleteAnswer(String username, Long id) {
         Answer answer = getAnswer(id);
-        checkUserExtracted(username, id, answer);
+        authorizationService.checkResourceOwner(username, answer);
         answerRepository.delete(answer);
     }
 
@@ -101,11 +102,5 @@ public class AnswerService {
 
     private Answer getAnswer(Long id) {
         return answerRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(RESOURCE_ERROR_MSG));
-    }
-
-    private static void checkUserExtracted(String username, Long id, Answer answer) {
-        if(!answer.getUser().getUsername().equals(username)) {
-            throw new UnauthorizedException("현재 접속한 유저가 작성한 글이 아닙니다. Username : " + username + " Answer Id : " + id);
-        }
     }
 }

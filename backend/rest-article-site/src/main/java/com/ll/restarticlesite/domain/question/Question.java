@@ -5,6 +5,7 @@ import com.ll.restarticlesite.domain.BaseEntity;
 import com.ll.restarticlesite.domain.answer.Answer;
 import com.ll.restarticlesite.domain.user.User;
 import com.ll.restarticlesite.domain.category.Category;
+import com.ll.restarticlesite.global.service.Ownable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,7 +21,7 @@ import java.util.Set;
 @Entity
 @Builder
 @AllArgsConstructor
-public class Question extends BaseEntity {
+public class Question extends BaseEntity implements Ownable {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "question_id")
     private long id;

@@ -93,7 +93,7 @@ public class UserRestController {
      * @param request 기존 비밀번호 및 새 비밀번호 값
      * @return 비밀번호 변경에 대한 상태코드 반환
      */
-    @PutMapping("/update-password")
+    @PatchMapping("/update-password")
     public ResponseEntity<Void> updatePassword(Principal principal,
                                                @Valid @RequestBody UserPasswordUpdateRequest request) {
         userService.modifyPassword(principal.getName(),

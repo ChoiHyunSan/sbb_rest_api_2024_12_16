@@ -114,8 +114,10 @@ public class QuestionRestController {
      */
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}")
-    public ResponseEntity<Void> modifyQuestion(@PathVariable Long id, @Valid @RequestBody QuestionCreateRequest request) {
-        questionService.modifyQuestion(id, request.getSubject(), request.getContent(), request.getCategory());
+    public ResponseEntity<Void> modifyQuestion(@PathVariable Long id,
+                                               @Valid @RequestBody QuestionCreateRequest request,
+                                               Principal principal) {
+        questionService.modifyQuestion(principal.getName(), id, request.getSubject(), request.getContent(), request.getCategory());
         return ResponseEntity.ok().build();
     }
 

@@ -8,8 +8,8 @@ import com.ll.restarticlesite.domain.category.Category;
 import com.ll.restarticlesite.domain.category.CategoryService;
 import com.ll.restarticlesite.domain.user.User;
 import com.ll.restarticlesite.domain.user.UserService;
+import com.ll.restarticlesite.global.service.AuthorizationService;
 import com.ll.restarticlesite.global.exception.ResourceNotFoundException;
-import com.ll.restarticlesite.global.exception.UnauthorizedException;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -39,6 +39,7 @@ public class QuestionService {
     private final CategoryService categoryService;
     private static final long PAGE_SIZE = 10;
     private final static int ANSWER_PAGE_SIZE = 5;
+    private final AuthorizationService authorizationService;
 
     private final static String RESOURCE_ERROR_MSG = "Question Resource Not Found";
 
@@ -135,8 +136,9 @@ public class QuestionService {
     }
 
     @Transactional
-    public void modifyQuestion(Long id, String subject, String content, Category category) {
+    public void modifyQuestion(String username, Long id, String subject, String content, Category category) {
         Question question = getQuestion(id);
+        authorizationService.checkResourceOwner(username, question);
         question.modify(subject, content, category);
         questionRepository.save(question);
     }
@@ -144,7 +146,7 @@ public class QuestionService {
     @Transactional
     public void deleteQuestion(String username, Long id) {
         Question question = getQuestion(id);
-        checkUserExtracted(username, question);
+        authorizationService.checkResourceOwner(username, question);
         questionRepository.delete(question);
     }
 
@@ -154,12 +156,6 @@ public class QuestionService {
         User user = userService.getUser(username);
         question.getVoter().add(user);
         questionRepository.save(question);
-    }
-
-    private static void checkUserExtracted(String username, Question question) {
-        if(!question.getUser().getUsername().equals(username)){
-            throw new UnauthorizedException("작성자가 일치하지 않습니다. 현재 로그인 : " + username + ", 작성자 : " + question.getUser().getUsername());
-        }
     }
 
     public Question getQuestion(Long questionId) {

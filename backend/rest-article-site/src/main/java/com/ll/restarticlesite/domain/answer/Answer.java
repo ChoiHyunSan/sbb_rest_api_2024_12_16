@@ -5,11 +5,11 @@ import com.ll.restarticlesite.domain.BaseEntity;
 import com.ll.restarticlesite.domain.comment.Comment;
 import com.ll.restarticlesite.domain.question.Question;
 import com.ll.restarticlesite.domain.user.User;
+import com.ll.restarticlesite.global.service.Ownable;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.BatchSize;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -17,7 +17,7 @@ import java.util.Set;
 
 @Getter
 @Entity
-public class Answer extends BaseEntity {
+public class Answer extends BaseEntity implements Ownable {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "answer_id")

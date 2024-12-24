@@ -1,4 +1,4 @@
-package com.ll.restarticlesite.global;
+package com.ll.restarticlesite.global.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
